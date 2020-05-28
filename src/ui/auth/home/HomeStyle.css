@@ -1,0 +1,36 @@
+* {
+    -fx-primary: rgb(215,219,214);
+    -fx-secondary: rgb(0,150,136);
+    -fx-primarytext: rgb(90,90,90);
+    -fx-labeltext: rgb(0,230,118);
+}
+.root {
+    -fx-background-color: -fx-primary;
+    -fx-font: 15px "Consolas";
+}
+
+.button {
+    -fx-background-color: none;
+    -fx-text-fill: -fx-secondary ;
+    -fx-border-radius: 5px;
+    -fx-border-color: -fx-secondary;
+    -fx-padding: 10px;
+    -fx-font-size: 17px;
+}
+.button:hover{
+    -fx-background-color: -fx-secondary;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 18px;
+}
+.hyperlink{
+    -fx-text-fill: -fx-secondary;
+    -fx-font-size: 17px;
+}
+.label{
+    -fx-font-size: 50px;
+    -fx-text-fill: -fx-secondary;
+    -fx-font-weight: bold;
+}
+.line{
+    -fx-background-color: -fx-secondary;
+}
