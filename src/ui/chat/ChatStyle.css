@@ -1,0 +1,57 @@
+* {
+    -fx-windowBar: #00bfa5;
+    -fx-topBar: #ededed;
+    -fx-searchBackground: #f7f7f7;
+    -fx-mainBackground: #ECE5DD;
+    -fx-messageBarBackground: #f0f0f0;
+    -fx-slider: #d3d0cd;
+    -fx-contactListBackground: #ffffff;
+}
+
+.window-bar {
+    -fx-background-color: -fx-windowBar;
+}
+
+.top-bar {
+    -fx-background-color: -fx-topBar;
+}
+
+.search-bar-bg {
+    -fx-background-color: -fx-searchBackground;
+}
+
+.contactlist-bg {
+    -fx-background-color: -fx-contactListBackground;
+}
+
+.main-bg {
+    -fx-background-color: -fx-mainBackground;
+}
+
+.message-layer {
+    -fx-background-image: url("../ressources/images/bg-chat.png");
+    -fx-background-color: transparent;
+    -fx-opacity: 0.15;
+}
+
+.message-bar-bg {
+    -fx-background-color: -fx-messageBarBackground;
+}
+
+.message-bar {
+    -fx-border-radius: 40 40 40 40;
+    -fx-background-radius: 40 40 40 40;
+    -fx-border-color: transparent;
+}
+
+.message-bar:focused {
+    -fx-border-color: transparent;
+}
+
+.send-button {
+    -fx-background-image: url('../ressources/images/send.png');
+    -fx-background-size: 30px;
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
