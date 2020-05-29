@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@ChatStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.chat.ChatView">
    <children>
       <Pane prefHeight="26.0" prefWidth="1280.0" styleClass="window-bar" />
-      <Pane layoutY="26.0" prefHeight="694.0" prefWidth="396.0" styleClass="contactlist-bg">
+      <Pane layoutY="26.0" prefHeight="694.0" prefWidth="396.0">
          <children>
-            <Pane prefHeight="61.0" prefWidth="396.0" styleClass="top-bar" />
+            <ScrollPane fx:id="clientListScroll" hbarPolicy="NEVER" layoutY="122.0" prefHeight="571.0" prefWidth="396.0" styleClass="contactlist-bg">
+              <content>
+                <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="573.0" prefWidth="396.0">
+                     <children>
+                        <VBox fx:id="clientListBox" prefHeight="571.0" prefWidth="396.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+            <Pane prefHeight="61.0" prefWidth="396.0" styleClass="top-bar">
+               <children>
+                  <ImageView fx:id="userImageProfile" fitHeight="50.0" fitWidth="50.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="userName" layoutX="72.0" layoutY="19.0" prefHeight="24.0" prefWidth="50.0" text="Label" />
+               </children>
+            </Pane>
             <Pane layoutY="61.0" prefHeight="61.0" prefWidth="396.0" styleClass="search-bar-bg">
                <children>
                   <TextField fx:id="searchInput" layoutX="42.0" layoutY="12.0" onKeyReleased="#handleEnterSearchKeyReleased" prefHeight="37.0" prefWidth="340.0" promptText="Rechercher ou démarrer un nouvelle discussion" styleClass="message-bar" />
@@ -22,13 +39,27 @@
          </children>
       </Pane>
       <Line endX="396.0" endY="26.0" startX="396.0" startY="720.0" strokeWidth="0.3" />
-      <Pane layoutX="396.0" layoutY="26.0" prefHeight="694.0" prefWidth="884.0" styleClass="main-bg">
+      <Pane layoutX="396.0" layoutY="26.0" prefHeight="694.0" prefWidth="884.0">
          <children>
-            <Pane prefHeight="61.0" prefWidth="884.0" styleClass="top-bar" />
-            <Pane layoutY="59.0" prefHeight="564.0" prefWidth="884.0" styleClass="message-layer" />
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" layoutY="59.0" prefHeight="564.0" prefWidth="884.0" styleClass="main-bg" vvalue="1.0">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="564.0" prefWidth="884.0">
+                     <children>
+                        <VBox fx:id="chatBox" alignment="TOP_RIGHT" prefHeight="564.0" prefWidth="884.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+            <Pane prefHeight="61.0" prefWidth="884.0" styleClass="top-bar">
+               <children>
+                  <Label fx:id="contactName" layoutX="74.0" layoutY="22.0" text="Label" />
+                  <ImageView fx:id="contactImageProfile" fitHeight="50.0" fitWidth="50.0" layoutX="6.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Pane>
+            <Pane layoutY="59.0" prefHeight="564.0" prefWidth="884.0" style="-fx-background-color: transparent;" styleClass="message-layer" />
             <Pane layoutY="623.0" prefHeight="71.0" prefWidth="884.0" styleClass="message-bar-bg">
                <children>
-                  <TextField fx:id="messageInput" layoutX="74.0" layoutY="14.0" onKeyReleased="#handleEnterSendKeyReleased" prefHeight="43.0" prefWidth="744.0" promptText="Taper un message" styleClass="message-bar" />
+                  <TextField fx:id="messageInput" focusTraversable="false" layoutX="74.0" layoutY="14.0" onKeyReleased="#handleEnterSendKeyReleased" prefHeight="43.0" prefWidth="744.0" promptText="Taper un message" styleClass="message-bar" />
                   <ImageView fitHeight="26.0" fitWidth="31.0" layoutX="832.0" layoutY="24.0" onMouseClicked="#handleSendMessageClick" pickOnBounds="true" preserveRatio="true" styleClass="send-button">
                      <cursor>
                         <Cursor fx:constant="HAND" />

@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class Main extends Application {
     private Boolean checkAuth = false;
 
@@ -16,22 +18,27 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        Parent login = FXMLLoader.load(getClass().getResource("ui/auth/home/HomeView.fxml"));
-        Parent create = FXMLLoader.load(getClass().getResource("./ui/auth/create/CreateAccountView.fxml"));
+    public void start(Stage primaryStage) {
+        try {
+            Parent login = FXMLLoader.load(getClass().getResource("ui/auth/home/HomeView.fxml"));
+            Parent create = FXMLLoader.load(getClass().getResource("./ui/auth/create/CreateAccountView.fxml"));
 
-        Scene loginScene = new Scene(login);
-        Scene createScene = new Scene(create);
+            Scene loginScene = new Scene(login);
+            Scene createScene = new Scene(create);
 
-        if(checkAuth) primaryStage.setScene(loginScene);
-        else primaryStage.setScene(createScene);
+            if(checkAuth) primaryStage.setScene(loginScene);
+            else primaryStage.setScene(createScene);
 
-        primaryStage.setTitle("Not WhatsApp");
-        primaryStage.getIcons().add(new Image("./ui/ressources/images/favicon.png"));
+            primaryStage.setTitle("Not WhatsApp");
+            primaryStage.getIcons().add(new Image("./ui/ressources/images/favicon.png"));
 //        primaryStage.getIcons().add( new Image( <yourclassname>.class.getResourceAsStream( "icon.png" )));
-        primaryStage.setResizable(false);
-        primaryStage.centerOnScreen();
-        primaryStage.show();
+            primaryStage.setResizable(false);
+            primaryStage.centerOnScreen();
+            primaryStage.show();
+        } catch (IOException e) {
+            System.out.println("yop");
+            e.printStackTrace();
+        }
     }
 //
 

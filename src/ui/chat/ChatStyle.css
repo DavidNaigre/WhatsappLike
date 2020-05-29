@@ -55,3 +55,7 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}

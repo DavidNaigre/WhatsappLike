@@ -24,10 +24,10 @@ public class HomeController implements Initializable {
     }
 
     public void handleSameAccountButtonClick(ActionEvent actionEvent) throws IOException {
-        Parent home = FXMLLoader.load(getClass().getResource("../../chat"));
-        Scene homeScene = new Scene(home);
+        Parent chat = FXMLLoader.load(getClass().getResource("../../chat/ChatView.fxml"));
+        Scene chatScene = new Scene(chat);
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
-        window.setScene(homeScene);
+        window.setScene(chatScene);
         window.show();
     }
 
