@@ -1,44 +1,72 @@
 package function.messages;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 public class HistoryBuilder {
+    public static ArrayList<ArrayList<String>> read(String to){
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        JSONParser parser = new JSONParser();
+        JSONArray jsonArray = new JSONArray();
 
-    public static void write(String to, Integer Personne, String message){
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        try (PrintWriter writer = new PrintWriter(new FileWriter("src/function/messages/History/"+to+".csv",true))){
-//            StringBuilder sb = new StringBuilder();
-//            String[] data = {Personne.toString(),formatter.format(date), message};
-//            for(String index : data){
-//                sb.append(index);
-//                sb.append("; ");
-//            }
-//            sb.append("\n");
-            String data = Personne.toString()+";"+formatter.format(date)+";"+message+" \n";
-            writer.write(data);
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        try(FileReader file = new FileReader("src/function/messages/History/"+to+".json"))  {
+            Object obj = parser.parse(file);
+            jsonArray = (JSONArray) obj;
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
         }
+
+        for(Object jsonData: jsonArray){
+            JSONObject tmpObj = new JSONObject((Map) jsonData);
+            data.add(new ArrayList<>(){{
+                add(tmpObj.get("date").toString());
+                add(tmpObj.get("from").toString());
+                add(tmpObj.get("message").toString());
+            }});
+        }
+        return data;
     }
 
-    public static ArrayList<ArrayList<String>> read(String to){
-        int i = 0;
-        ArrayList<ArrayList<String>> data = new ArrayList<>();
-        try(BufferedReader buf_read = new BufferedReader(new InputStreamReader(new FileInputStream("src/function/messages/History/"+to+".csv")))){
-            String line;
-            while ((line = buf_read.readLine()) != null){
-                data.add(new ArrayList<>());
-                String[] FillColumn = line.split("\t");
-                for ( String s : FillColumn ) data.get(i).add(s);
-                i++;
-            }
+    public static void write(String from, String to , String message) throws IOException, ParseException{
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        JSONParser parser = new JSONParser();
+        JSONArray historyArray = new JSONArray();
+
+        try(FileReader file = new FileReader("src/function/messages/History/"+to+".json")){
+            Object obj = parser.parse(file);
+            JSONArray jsonArray = (JSONArray) obj;
+            if(!jsonArray.isEmpty()) historyArray = jsonArray;
+        } catch (FileNotFoundException e){
+            System.out.println(to+".json will be created");
+        }
+
+        JSONObject obj = new JSONObject();
+        obj.put("date",formatter.format(date));
+        obj.put("from",from);
+        obj.put("message",message);
+        historyArray.add(obj);
+
+        try(FileWriter file = new FileWriter("src/function/messages/History/"+to+".json",false)) {
+            file.write(historyArray.toString());
+            file.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return data;
+    }
+
+    public static ArrayList<String> getContactList(){
+        ArrayList<String> result = new ArrayList<>();
+        File[] files = new File("src/function/messages/history").listFiles();
+        for (File file: files) if (file.isFile()) result.add(file.getName().substring(0, file.getName().length() - 5));
+        return result;
     }
 }

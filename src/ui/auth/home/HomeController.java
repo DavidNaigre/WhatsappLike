@@ -28,6 +28,7 @@ public class HomeController implements Initializable {
         Scene chatScene = new Scene(chat);
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         window.setScene(chatScene);
+        window.centerOnScreen();
         window.show();
     }
 

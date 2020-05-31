@@ -1,3 +1,5 @@
+@import url('../ressources/font/Helvetica/Helvetica.ttf');
+
 * {
     -fx-windowBar: #00bfa5;
     -fx-topBar: #ededed;
@@ -6,6 +8,10 @@
     -fx-messageBarBackground: #f0f0f0;
     -fx-slider: #d3d0cd;
     -fx-contactListBackground: #ffffff;
+    -fx-usermsgColor: #dcf8c6;
+}
+.root {
+    -fx-font: 15px "Helvetica";
 }
 
 .window-bar {
@@ -26,12 +32,7 @@
 
 .main-bg {
     -fx-background-color: -fx-mainBackground;
-}
-
-.message-layer {
     -fx-background-image: url("../ressources/images/bg-chat.png");
-    -fx-background-color: transparent;
-    -fx-opacity: 0.15;
 }
 
 .message-bar-bg {
@@ -41,21 +42,122 @@
 .message-bar {
     -fx-border-radius: 40 40 40 40;
     -fx-background-radius: 40 40 40 40;
-    -fx-border-color: transparent;
-}
-
-.message-bar:focused {
-    -fx-border-color: transparent;
+    -fx-background-color:  white, -fx-text-box-border, -fx-control-inner-background;
 }
 
 .send-button {
     -fx-background-image: url('../ressources/images/send.png');
     -fx-background-size: 30px;
     -fx-background-color: transparent;
+    -fx-border-color: transparent;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 .scroll-pane .viewport {
     -fx-background-color: transparent;
+}
+
+.name-label {
+    -fx-font-size: 20px;
+}
+
+
+/* OTHER */
+.message{
+    -fx-font-size: 16px;
+    -fx-font-weight: 300;
+}
+
+.textFlow{
+    -fx-background-color: -fx-usermsgColor;
+    -fx-background-insets: -5 -10 -5 -5;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.08),1.2,1.0,0.5,0.5);
+    -fx-shape: "M 5 0 L 5 0 L 5 0 C 2 0 0 2 0 5 V 38 C 0 42 2 43 5 43 L 72 43 C 75 43 76 41 76 39 L 76 7 L 84 0 H 75";
+}
+
+.textFlowFlipped{
+    -fx-background-color: white;
+    -fx-background-insets: -5 -5 -5 -10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08),1.2,1.0,-0.5,-0.5);
+    -fx-shape: "M 7 55 L 0 55 L 7 63 V 93 C 7 97 8 98 12 98 H 75 C 79 98 80 97 80 93 V 60 C 80 56 80 55 75 55";
+}
+
+.tempFlow{
+    -fx-padding: 5 25 5 5;
+}
+
+.tempFlowFlipped{
+    -fx-padding: 5 5 5 25;
+}
+
+.hbox{
+    -fx-background-insets: 15;
+    -fx-padding: 12px;
+}
+
+.scroll-pane .scroll-bar:vertical, #txtMsg .scroll-bar:vertical{
+    -fx-background-color:inherit;
+}
+
+.scroll-pane .scroll-bar:vertical .track{
+    -fx-background-color:transparent;
+    -fx-border-color:transparent;
+    -fx-background-radius: 0em;
+
+}
+.scroll-pane .scroll-bar:vertical .increment-button,
+.scroll-pane .scroll-bar:vertical .decrement-button{
+    -fx-background-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-padding:0 0 10 0;
+}
+
+.scroll-pane  .scroll-bar .increment-arrow,
+.scroll-pane  .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding:0;
+}
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color:transparent;
+}
+
+#scrollPane .scroll-bar:vertical{
+    -fx-background-color:inherit;
+}
+
+#scrollPane .scroll-bar:vertical .track{
+    -fx-background-color:transparent;
+    -fx-border-color:transparent;
+    -fx-background-radius: 0em;
+}
+
+#scrollPane .scroll-bar:vertical .increment-button,
+#scrollPane .scroll-bar:vertical .decrement-button{
+    -fx-background-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-padding:0 0 10 0;
+
+}
+
+#scrollPane  .scroll-bar .increment-arrow,
+#scrollPane  .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding:0;
+}
+
+#scrollPane .scroll-bar:vertical .thumb {
+    -fx-background-color:transparent;
+
+}
+
+#scrollPane:hover .scroll-bar:vertical .thumb{
+    -fx-background-color:rgba(0,0,0,0.2);
+    -fx-background-insets: 4,0,0;
+    -fx-background-radius: 2em;
+}
+
+.chatBox{
+    -fx-padding: 20px;
+    -fx-background-insets: -25px;
 }
