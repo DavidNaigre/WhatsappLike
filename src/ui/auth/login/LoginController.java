@@ -1,7 +1,6 @@
 package ui.auth.login;
 
 import function.user.AuthUser;
-import function.user.User;
 import function.user.UserTemp;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,8 +35,7 @@ public class LoginController implements Initializable {
     public void handleCreateAccountButtonAction(ActionEvent actionEvent) throws IOException {
         String id = idTextarea.getText();
         if(UserTemp.checkParameters(id)) {
-            AuthUser.register();
-            System.out.println("IT WORKED !");
+            if(AuthUser.register()) System.out.println("IT WORKED !");
         }
     }
 }

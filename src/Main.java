@@ -1,4 +1,3 @@
-import function.messages.HistoryBuilder;
 import function.user.AuthUser;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +15,6 @@ public class Main extends Application {
     public void init() throws Exception {
         super.init();
         checkAuth = AuthUser.isAuth();
-        System.out.println(HistoryBuilder.getContactList().toString());
     }
 
     @Override
@@ -33,7 +31,6 @@ public class Main extends Application {
 
             primaryStage.setTitle("Not WhatsApp");
             primaryStage.getIcons().add(new Image("./ui/ressources/images/favicon.png"));
-//        primaryStage.getIcons().add( new Image( <yourclassname>.class.getResourceAsStream( "icon.png" )));
             primaryStage.setResizable(false);
             primaryStage.centerOnScreen();
             primaryStage.show();

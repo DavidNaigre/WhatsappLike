@@ -161,3 +161,32 @@
     -fx-padding: 20px;
     -fx-background-insets: -25px;
 }
+
+.online-label , .online-settings{
+    -fx-text-fill: black;
+    -fx-font-size: 17px;
+}
+
+.online-settings:hover{
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+}
+
+.online-label-details{
+    -fx-text-fill: rgba(0,0,0,0.6);
+    -fx-font-size: 14px;
+}
+.online-user-container{
+    -fx-background-color: inherit;
+    -fx-border-color: -fx-topBar;
+    -fx-border-width: 0 0 1 0;
+}
+
+.online-user-container-active{
+    -fx-background-color: rgb(235, 235, 235);
+}
+
+.online-user-container:hover{
+    -fx-background-color: rgb(245, 245, 245);
+    -fx-border-color: -fx-topBar;
+}

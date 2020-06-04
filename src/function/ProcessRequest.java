@@ -8,17 +8,16 @@ import java.net.URL;
 import java.util.Map;
 
 public class ProcessRequest {
-    private static URL url;
     private static Object HttpURLConnection;
     private static HttpURLConnection con;
 
-    public static String start (Map<String, String> parameters, String action) throws IOException {
+    public static String start (Map<String, String> parameters, String action) {
         String urlParameters = ParameterStringBuilder.getParamsString(parameters);
         String inputLine;
         StringBuilder content = new StringBuilder();
 
         try {
-            url = new URL("https://trankillprojets.fr/wal/wal.php?"+action+"&"+urlParameters);
+            URL url = new URL("https://trankillprojets.fr/wal/wal.php?" + action + "&" + urlParameters);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
