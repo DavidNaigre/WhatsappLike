@@ -214,3 +214,12 @@
     -fx-text-fill: #fff;
     -fx-font-size: 13px;
 }
+
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: rgba(0,0,0,0.7);
+    -fx-font-size: 30px;
+    -fx-text-alignment: center;
+    -fx-padding: 0 0 0 0;
+}

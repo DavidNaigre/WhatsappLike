@@ -194,4 +194,10 @@ public class ChatView implements Initializable {
         Runtime.getRuntime().exit(0);
         ((Stage)closeButton.getScene().getWindow()).close();
     }
+
+    public void handleOptionPaneButton(ActionEvent actionEvent) {
+    }
+
+    public void handleNewRelationButton(ActionEvent actionEvent) {
+    }
 }
