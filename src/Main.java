@@ -33,6 +33,7 @@ public class Main extends Application {
             primaryStage.getIcons().add(new Image("./ui/ressources/images/favicon.png"));
             primaryStage.setResizable(false);
             primaryStage.centerOnScreen();
+//            primaryStage.initStyle(StageStyle.UNDECORATED);
             primaryStage.show();
         } catch (IOException e) {
             System.out.println("yop");
@@ -42,7 +43,7 @@ public class Main extends Application {
 
 
 //    public static void main(String[] args) throws IOException, ParseException {
-
+    /* UTILISE*/
 //        launch(args);
 //        System.out.println(AuthUser.register("90d3a5ef2bdd3b6ca01dac0045e3f41fed0f0334ca48c97a0e78b3247492b7c9","Constantin","davidnaigre@gmail.com"));
 //        System.out.println(AuthUser.isAuth());
@@ -52,6 +53,7 @@ public class Main extends Application {
 //        System.out.println(HistoryBuilder.read("Gilbert"));
 //        System.out.println(HistoryBuiler.read("Jacque"));
 
+    /* NON UTILISE*/
 //        System.out.println(u1.sendMessage("474","Message avec espace deuxième test avec +"));
 //        System.out.println(u1.readMessage("474"));
 //        System.out.println(u1.newRelation("menelik-971@hotmail.com"));

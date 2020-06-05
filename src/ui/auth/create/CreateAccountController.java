@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class CreateAccountController implements Initializable {
     @FXML private TextField mailField, pseudoField;
     @FXML private Text errorMessageMail, errorMessagePseudo;
-    @FXML private Button transmitButton;
+    @FXML private Button transmitButton, closeButton;
     private Boolean mailCheck, PseudoCheck;
 
     public static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -115,5 +115,10 @@ public class CreateAccountController implements Initializable {
 
     public void disableButton(KeyEvent keyEvent) {
         transmitButton.setDisable(!mailCheck || !PseudoCheck);
+    }
+
+    public void closeBtn (ActionEvent actionEvent){
+        Runtime.getRuntime().exit(0);
+        ((Stage)closeButton.getScene().getWindow()).close();
     }
 }

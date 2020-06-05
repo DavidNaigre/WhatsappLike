@@ -15,12 +15,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
@@ -28,33 +30,52 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ChatView implements Initializable {
-    @FXML private ScrollPane clientListScroll, scrollPane;
+    @FXML private ScrollPane scrollPane;
     @FXML private VBox clientListBox, chatBox;
     @FXML private TextField searchInput, messageInput;
     @FXML private Label userName, contactName;
     @FXML private ImageView userImageProfile, contactImageProfile;
-    @FXML private Button sendButton;
-    private String toName = "Gilbert";
+    @FXML private Button sendButton, closeButton;
+    @FXML private Pane startPane, titleBar;
+    private double xOffset,yOffset;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         sendButton.setDisable(true);
         userName.setText(User.getIdentifiant());
+        titleBar.setOnMousePressed(e -> {
+            xOffset = e.getSceneX();
+            yOffset = e.getSceneY();
+        });
+        titleBar.setOnMouseDragged(e -> {
+            titleBar.getScene().getWindow().setX(e.getScreenX() - xOffset);
+            titleBar.getScene().getWindow().setY(e.getScreenY() - yOffset);
+        });
+
+        startPane.visibleProperty().addListener(observable -> {
+            if(startPane.isVisible()){
+                searchInput.setDisable(true);
+                messageInput.setDisable(true);
+            } else {
+                searchInput.setDisable(false);
+                messageInput.setDisable(false);
+            }
+        });
+        try {
+            var path = new File("src/ui/ressources/profile/user.png").toURI().toString();
+            URL imgUrl = getClass().getResource(path);
+            if(imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
+            userImageProfile.setImage(new Image(path));
+            userImageProfile.getStyleClass().add("image-view");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         messageInput.textProperty().addListener(observable-> sendButton.setDisable(messageInput.getText().isEmpty()));
         chatBox.heightProperty().addListener(observable -> {
             scrollPane.layout();
             scrollPane.setVvalue(1D);
         });
-        try {
-            var path = new File(String.format("src/ui/ressources/profile/%s.png",toName)).toURI().toString();
-            URL imgUrl = getClass().getResource(path);
-            if(imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
-            contactImageProfile.setImage(new Image(path));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(toName));
-        if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
         updateUI(HistoryBuilder.getContactList());
     }
 
@@ -67,7 +88,7 @@ public class ChatView implements Initializable {
 
     public void handleSendMessageClick(ActionEvent actionEvent) {
         String message = messageInput.getText().trim();
-        if(!message.isEmpty() && updateMSG(userName.getText(),message)) HistoryBuilder.write(userName.getText(), toName, message);
+        if(!message.isEmpty() && updateMSG(userName.getText(),message)) HistoryBuilder.write(userName.getText(), contactName.getText(), message);
         messageInput.clear();
     }
 
@@ -143,6 +164,8 @@ public class ChatView implements Initializable {
             container.getChildren().add(settings);
 
             container.setOnMouseClicked(e -> {
+                startPane.setVisible(false);
+                startPane.setDisable(true);
                 clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
                 container.getStyleClass().add("online-user-container-active");
                 changeChat(lblUsername.getText());
@@ -155,9 +178,20 @@ public class ChatView implements Initializable {
         Platform.runLater(()-> chatBox.getChildren().removeAll(chatBox.getChildren()));
         contactName.setText(to);
         messageInput.clear();
+        try {
+            var path = new File(String.format("src/ui/ressources/profile/%s.png",contactName.getText())).toURI().toString();
+            URL imgUrl = getClass().getResource(path);
+            if(imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
+            contactImageProfile.setImage(new Image(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(to));
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
     }
 
-    public void closeBtn (){}
+    public void closeBtn (ActionEvent actionEvent){
+        Runtime.getRuntime().exit(0);
+        ((Stage)closeButton.getScene().getWindow()).close();
+    }
 }

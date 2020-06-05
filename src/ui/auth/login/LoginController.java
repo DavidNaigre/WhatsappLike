@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
@@ -18,6 +19,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML private TextArea idTextarea;
+    @FXML private Button closeButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -37,5 +39,9 @@ public class LoginController implements Initializable {
         if(UserTemp.checkParameters(id)) {
             if(AuthUser.register()) System.out.println("IT WORKED !");
         }
+    }
+    public void closeBtn (ActionEvent actionEvent){
+        Runtime.getRuntime().exit(0);
+        ((Stage)closeButton.getScene().getWindow()).close();
     }
 }

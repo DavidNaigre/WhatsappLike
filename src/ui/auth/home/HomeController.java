@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
-    @FXML private Button currentSession;
+    @FXML private Button currentSession, closeButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -38,5 +38,10 @@ public class HomeController implements Initializable {
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         window.setScene(homeScene);
         window.show();
+    }
+
+    public void closeBtn (ActionEvent actionEvent){
+        Runtime.getRuntime().exit(0);
+        ((Stage)closeButton.getScene().getWindow()).close();
     }
 }

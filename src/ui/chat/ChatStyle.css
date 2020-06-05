@@ -62,8 +62,6 @@
     -fx-font-size: 20px;
 }
 
-
-/* OTHER */
 .message{
     -fx-font-size: 16px;
     -fx-font-weight: 300;
@@ -189,4 +187,30 @@
 .online-user-container:hover{
     -fx-background-color: rgb(245, 245, 245);
     -fx-border-color: -fx-topBar;
+}
+.start-pane {
+    -fx-background-color: #F8F9FA;
+    -fx-background-image: url("../ressources/images/intro-connection-back.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 50% 35%;
+    -fx-border-color: #4adf83 rgba(0, 0, 0, .08);
+    -fx-border-width: 0 0 6 1;
+}
+
+.creator-name {
+    -fx-fill: #525252;
+}
+
+.close-btn{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 19px;
+    -fx-text-alignment: center;
+    -fx-padding: 0 0 0 0;
+}
+
+.app-title {
+    -fx-text-fill: #fff;
+    -fx-font-size: 13px;
 }
