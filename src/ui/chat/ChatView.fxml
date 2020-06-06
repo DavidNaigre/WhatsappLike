@@ -103,7 +103,7 @@
                <Label layoutX="94.0" layoutY="174.0" styleClass="new-contact-label" text="NOUVEAU CONTACT" />
                <TextFlow fx:id="serverReponseBox" layoutX="119.0" layoutY="251.0" prefHeight="31.0" prefWidth="198.0" styleClass="request-statut" visible="false">
                   <children>
-                     <Text fx:id="serverReponseText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="request-statut" text="état de requete" />
+                     <Text fx:id="serverReponseText" strokeType="OUTSIDE" strokeWidth="0.0" text="état de requete" wrappingWidth="112.689453125" />
                   </children>
                   <opaqueInsets>
                      <Insets />

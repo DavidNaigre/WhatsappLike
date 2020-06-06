@@ -52,11 +52,12 @@ public class Main extends Application {
 //        HistoryBuilder.write("Gilbert","Gilbert","MAMAMIA");
 //        System.out.println(HistoryBuilder.read("Gilbert"));
 //        System.out.println(HistoryBuiler.read("Jacque"));
-
-    /* NON UTILISE*/
 //        System.out.println(u1.sendMessage("474","Message avec espace deuxième test avec +"));
 //        System.out.println(u1.readMessage("474"));
 //        System.out.println(u1.newRelation("menelik-971@hotmail.com"));
+
+    /* NON UTILISE*/
+//        System.out.println(u1.deleteRelation("menelik-971@hotmail.com"));
 
 //    }
 }

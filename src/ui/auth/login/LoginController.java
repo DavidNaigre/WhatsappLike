@@ -37,7 +37,13 @@ public class LoginController implements Initializable {
     public void handleCreateAccountButtonAction(ActionEvent actionEvent) throws IOException {
         String id = idTextarea.getText();
         if(UserTemp.checkParameters(id)) {
-            if(AuthUser.register()) System.out.println("IT WORKED !");
+            if(AuthUser.register()) {
+                Parent home = FXMLLoader.load(getClass().getResource("../../chat/ChatView.fxml"));
+                Scene homeScene = new Scene(home);
+                Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+                window.setScene(homeScene);
+                window.show();
+            }
         }
     }
     public void closeBtn (ActionEvent actionEvent){

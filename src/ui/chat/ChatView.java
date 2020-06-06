@@ -31,6 +31,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,9 +48,11 @@ public class ChatView implements Initializable {
     @FXML private Button sendButton, closeButton, reduceButton, newContactSend;
     @FXML private Pane startPane, titleBar, newRelationPane;
     private double xOffset,yOffset;
-
-    private Boolean mailCheck;
-    public static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private String contactId = "";
+    private int nbrOfContact;
+    private static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private final int THREADS_NUMBER_ALLOW = 2;
+    private final  ScheduledExecutorService pool = Executors.newScheduledThreadPool(THREADS_NUMBER_ALLOW);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -104,9 +109,21 @@ public class ChatView implements Initializable {
             scrollPane.layout();
             scrollPane.setVvalue(1D);
         });
-        updateUI(HistoryBuilder.getContactList());
-    }
+        nbrOfContact = updateContactList();
+       pool.scheduleAtFixedRate(()->{
+            int tempNbrOfContact = updateContactList();
+            if(tempNbrOfContact > nbrOfContact) System.out.println((tempNbrOfContact - nbrOfContact)+" contact add");
+            else if(tempNbrOfContact < nbrOfContact) System.out.println((nbrOfContact - tempNbrOfContact)+" contact removed");
+            nbrOfContact = tempNbrOfContact;
+        },0,2000, TimeUnit.MILLISECONDS);
 
+        pool.scheduleAtFixedRate(()->{
+            if(!contactId.isEmpty()){
+                Map<String,String> messageList = UserAction.readMessage(contactId);
+                messageList.forEach(this::updateMSG);
+            }
+        },1000, 1000, TimeUnit.MILLISECONDS);
+    }
 
     public void handleEnterSearchKeyReleased(ActionEvent actionEvent) {
         String message = searchInput.getText().trim();
@@ -116,7 +133,10 @@ public class ChatView implements Initializable {
 
     public void handleSendMessageClick(ActionEvent actionEvent) {
         String message = messageInput.getText().trim();
-        if(!message.isEmpty() && updateMSG(userName.getText(),message)) HistoryBuilder.write(userName.getText(), contactName.getText(), message);
+        if(!message.isEmpty() && updateMSG(userName.getText(),message)) {
+            UserAction.sendMessage(contactId, message);
+            HistoryBuilder.write(userName.getText(), contactName.getText(), message);
+        }
         messageInput.clear();
     }
 
@@ -148,10 +168,14 @@ public class ChatView implements Initializable {
         return true;
     }
 
-    public void updateUI(ArrayList<String> contactList) {
+    private int updateContactList() {
+        Map<String, String> contactList = UserAction.getListRelation();
         Platform.runLater(() -> clientListBox.getChildren().clear());
-        for(String contact : contactList){
-            if(contact.equals(this.userName.getText())) continue;
+        for ( Map.Entry<String, String> entry : contactList.entrySet() ) {
+            String id = entry.getKey();
+            String name = entry.getValue();
+
+            if (name.equals(this.userName.getText())) continue;
             HBox container = new HBox();
             container.setAlignment(Pos.CENTER);
             container.setSpacing(20);
@@ -159,11 +183,11 @@ public class ChatView implements Initializable {
             container.setPadding(new Insets(10));
             container.getStyleClass().add("online-user-container");
             //Photo de profile
-            Circle img =  new Circle(60,60,30);
+            Circle img = new Circle(60, 60, 30);
             try {
-                var path = new File(String.format("src/ui/ressources/profile/%s.png",contact)).toURI().toString();
+                var path = new File(String.format("src/ui/ressources/profile/%s.png", name)).toURI().toString();
                 URL imgUrl = getClass().getResource(path);
-                if(imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
+                if (imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
                 img.setFill(new ImagePattern(new Image(path)));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -172,16 +196,18 @@ public class ChatView implements Initializable {
 
             //Nom contact
             VBox userDetailContainer = new VBox();
-            userDetailContainer.setPrefWidth(clientListBox.getPrefWidth()/1.5);
-            Label lblUsername = new Label(contact);
+            userDetailContainer.setPrefWidth(clientListBox.getPrefWidth() / 1.5);
+            Label lblUsername = new Label(name);
             lblUsername.getStyleClass().add("online-label");
             userDetailContainer.getChildren().add(lblUsername);
 
-            ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(contact));
-            String lastMessage = history.size() > 0 ? history.get(history.size()-1).get(2) : "";
+
+            //TODO : refaire le truc de last message
+//            ArrayList<ArrayList<String>> history = new ArrayList<>(HistoryBuilder.read(name));
+//            String lastMessage = history.size() > 0 ? history.get(history.size() - 1).get(2) : "";
 
             //Dernier message
-            Label lblname = new Label(lastMessage);
+            Label lblname = new Label("");
             lblname.getStyleClass().add("online-label-details");
             userDetailContainer.getChildren().add(lblname);
             container.getChildren().add(userDetailContainer);
@@ -196,14 +222,17 @@ public class ChatView implements Initializable {
                 startPane.setDisable(true);
                 clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
                 container.getStyleClass().add("online-user-container-active");
-                changeChat(lblUsername.getText());
+                changeChat(lblUsername.getText(), id);
             });
             Platform.runLater(() -> clientListBox.getChildren().add(container));
         }
+        return contactList.size();
     }
-    public void changeChat (String to){
+
+    public void changeChat(String to, String id){
         Platform.runLater(()-> chatBox.getChildren().removeAll(chatBox.getChildren()));
         contactName.setText(to);
+        contactId = id;
         messageInput.clear();
         try {
             var path = new File(String.format("src/ui/ressources/profile/%s.png",contactName.getText())).toURI().toString();
@@ -216,8 +245,10 @@ public class ChatView implements Initializable {
         ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(to));
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
     }
+
     public void handleOptionPaneButton(ActionEvent actionEvent) {
     }
+
     public void handleNewRelationButton(ActionEvent actionEvent) {
         if(!newRelationPane.isVisible()) {
             newRelationPane.setVisible(true);
@@ -228,17 +259,19 @@ public class ChatView implements Initializable {
             serverReponseBox.setVisible(false);
         }
     }
+
     public void handleNewContactCancel(ActionEvent actionEvent) {
         newRelationPane.setVisible(false);
         searchInput.setDisable(false);
         serverReponseBox.setVisible(false);
     }
+
     public void handelNewContactSend(ActionEvent actionEvent) {
         String mail = newContactInput.getText();
         if(!mail.isEmpty() && checkMail(mail)){
             Task task = new Task<Void>() {
                 @Override
-                protected Void call() throws Exception {
+                protected Void call() {
                     serverReponseBox.getStyleClass().removeAll("request-statut-fail","request-statut-success");
                     if(UserAction.newRelation(mail)) {
                         updateContactList();
@@ -258,18 +291,16 @@ public class ChatView implements Initializable {
         }
     }
 
-    private void updateContactList() {
-        Map contactList = UserAction.getListRelation();
-
-    }
-
     public void closeBtn (ActionEvent actionEvent){
+        pool.shutdown();
         Runtime.getRuntime().exit(0);
         ((Stage)closeButton.getScene().getWindow()).close();
     }
+
     public void handleReduceButton(ActionEvent actionEvent) {
         ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
     }
+
     public boolean checkMail(String emailStr) {
         Matcher matcher = VALIDEMAIL.matcher(emailStr);
         return matcher.find();

@@ -8,14 +8,12 @@ import java.net.URL;
 import java.util.Map;
 
 public class ProcessRequest {
-    private static Object HttpURLConnection;
     private static HttpURLConnection con;
 
-    public static String start (Map<String, String> parameters, String action) {
+    public synchronized static String start (Map<String, String> parameters, String action) {
         String urlParameters = ParameterStringBuilder.getParamsString(parameters);
         String inputLine;
         StringBuilder content = new StringBuilder();
-
         try {
             URL url = new URL("https://trankillprojets.fr/wal/wal.php?" + action + "&" + urlParameters);
             con = (HttpURLConnection) url.openConnection();
