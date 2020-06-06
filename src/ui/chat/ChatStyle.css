@@ -9,6 +9,7 @@
     -fx-slider: #d3d0cd;
     -fx-contactListBackground: #ffffff;
     -fx-usermsgColor: #dcf8c6;
+    -fx-errorColor : #dc3545;
 }
 .root {
     -fx-font: 15px "Helvetica";
@@ -201,13 +202,18 @@
     -fx-fill: #525252;
 }
 
-.close-btn{
+.title-bar-button{
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-text-fill: white;
     -fx-font-size: 19px;
     -fx-text-alignment: center;
-    -fx-padding: 0 0 0 0;
+    -fx-padding: 0 15 0 15;
+    -fx-background-radius: 0 0 0 0;
+    -fx-border-radius: 0 0 0 0;
+}
+.title-bar-button:hover {
+    -fx-background-color: #009c86;
 }
 
 .app-title {
@@ -222,4 +228,56 @@
     -fx-font-size: 30px;
     -fx-text-alignment: center;
     -fx-padding: 0 0 0 0;
+}
+
+.new-contact-pane {
+    -fx-background-color: #d4d4d4;
+
+}
+.new-contact-label{
+    -fx-font-size: 25px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+
+.new-contact-cancel{
+    -fx-text-fill: #009c86;
+}
+.new-contact-send{
+    -fx-background-color: #009c86;
+    -fx-text-fill:  #ffffff;
+    -fx-border-radius: 5px;
+}
+
+.new-contact-textfield{
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent;
+    -fx-border-radius: 50 50 50 50;
+    -fx-background-radius: 50 50 50 50;
+}
+
+.new-contact-error {
+    -fx-font-size: 14px;
+    -fx-fill: -fx-errorColor;
+}
+
+.request-statut {
+    -fx-font-size: 14px;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-text-alignment: justify;
+}
+
+.request-statut-success {
+    -fx-border-color: #c3e6cb;
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+}
+
+.request-statut-fail {
+    -fx-border-color:#f5c6cb;
+    -fx-background-color: #f8d7da;
+    -fx-text-fill: #721c24;
 }

@@ -2,7 +2,9 @@ package ui.chat;
 
 import function.messages.HistoryBuilder;
 import function.user.User;
+import function.user.UserAction;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,17 +29,25 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChatView implements Initializable {
     @FXML private ScrollPane scrollPane;
     @FXML private VBox clientListBox, chatBox;
-    @FXML private TextField searchInput, messageInput;
+    @FXML private TextField searchInput, messageInput, newContactInput;
+    @FXML private TextFlow serverReponseBox;
+    @FXML private Text errorMessageMail, serverReponseText;
     @FXML private Label userName, contactName;
     @FXML private ImageView userImageProfile, contactImageProfile;
-    @FXML private Button sendButton, closeButton;
-    @FXML private Pane startPane, titleBar;
+    @FXML private Button sendButton, closeButton, reduceButton, newContactSend;
+    @FXML private Pane startPane, titleBar, newRelationPane;
     private double xOffset,yOffset;
+
+    private Boolean mailCheck;
+    public static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -50,6 +60,24 @@ public class ChatView implements Initializable {
         titleBar.setOnMouseDragged(e -> {
             titleBar.getScene().getWindow().setX(e.getScreenX() - xOffset);
             titleBar.getScene().getWindow().setY(e.getScreenY() - yOffset);
+        });
+        newContactSend.setDisable(true);
+        newContactInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newContactInput.getText().isEmpty()) {
+                errorMessageMail.setText("Veuillez compléter ce champ");
+                errorMessageMail.setVisible(true);
+                newContactSend.setDisable(true);
+            } else {
+                if (!checkMail(newContactInput.getText())){
+                    errorMessageMail.setText("Veuillez renseigner une adresse email valide");
+                    errorMessageMail.setVisible(true);
+                    newContactSend.setDisable(true);
+                } else {
+                    errorMessageMail.setText("");
+                    errorMessageMail.setVisible(false);
+                    newContactSend.setDisable(false);
+                }
+            }
         });
 
         startPane.visibleProperty().addListener(observable -> {
@@ -173,7 +201,6 @@ public class ChatView implements Initializable {
             Platform.runLater(() -> clientListBox.getChildren().add(container));
         }
     }
-
     public void changeChat (String to){
         Platform.runLater(()-> chatBox.getChildren().removeAll(chatBox.getChildren()));
         contactName.setText(to);
@@ -189,15 +216,62 @@ public class ChatView implements Initializable {
         ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(to));
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
     }
+    public void handleOptionPaneButton(ActionEvent actionEvent) {
+    }
+    public void handleNewRelationButton(ActionEvent actionEvent) {
+        if(!newRelationPane.isVisible()) {
+            newRelationPane.setVisible(true);
+            searchInput.setDisable(true);
+        } else {
+            newRelationPane.setVisible(false);
+            searchInput.setDisable(false);
+            serverReponseBox.setVisible(false);
+        }
+    }
+    public void handleNewContactCancel(ActionEvent actionEvent) {
+        newRelationPane.setVisible(false);
+        searchInput.setDisable(false);
+        serverReponseBox.setVisible(false);
+    }
+    public void handelNewContactSend(ActionEvent actionEvent) {
+        String mail = newContactInput.getText();
+        if(!mail.isEmpty() && checkMail(mail)){
+            Task task = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    serverReponseBox.getStyleClass().removeAll("request-statut-fail","request-statut-success");
+                    if(UserAction.newRelation(mail)) {
+                        updateContactList();
+                        serverReponseBox.getStyleClass().add("request-statut-success");
+                        serverReponseText.setText("Nouvelle relation créé");
+                        serverReponseText.setFill(Color.valueOf("#155724"));
+                    } else {
+                        serverReponseBox.getStyleClass().add("request-statut-fail");
+                        serverReponseText.setText("Adresse e-mail invalide");
+                        serverReponseText.setFill(Color.valueOf("#721c24"));
+                    }
+                    serverReponseBox.setVisible(true);
+                    return null;
+                }
+            };
+            new Thread(task).start();
+        }
+    }
+
+    private void updateContactList() {
+        Map contactList = UserAction.getListRelation();
+
+    }
 
     public void closeBtn (ActionEvent actionEvent){
         Runtime.getRuntime().exit(0);
         ((Stage)closeButton.getScene().getWindow()).close();
     }
-
-    public void handleOptionPaneButton(ActionEvent actionEvent) {
+    public void handleReduceButton(ActionEvent actionEvent) {
+        ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
     }
-
-    public void handleNewRelationButton(ActionEvent actionEvent) {
+    public boolean checkMail(String emailStr) {
+        Matcher matcher = VALIDEMAIL.matcher(emailStr);
+        return matcher.find();
     }
 }

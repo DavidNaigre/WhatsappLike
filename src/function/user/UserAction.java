@@ -45,7 +45,7 @@ public class UserAction {
         return false;
     }
 
-    public boolean newRelation(String email) throws IOException {
+    public static boolean newRelation(String email) throws IOException {
         Map<String, String> hm = new HashMap<>();
         hm.put( "identifiant", User.getId());
         hm.put( "mail",email);
@@ -57,7 +57,7 @@ public class UserAction {
         return param_message.contains("OK");
     }
 
-    public boolean delRelation(String email) throws IOException {
+    public static boolean delRelation(String email) throws IOException {
         Map<String, String> hm = new HashMap<>();
         hm.put( "identifiant", User.getId());
         hm.put( "mail",email);
@@ -68,25 +68,29 @@ public class UserAction {
         return param_message.contains("OK");
     }
 
-    public Map<String, String> getListRelation() throws IOException {
+    public static Map<String, String> getListRelation(){
         Map<String, String> hm = new HashMap<>();
-        Map <String, String> relationMap = new HashMap<>();
-        hm.put( "identifiant", User.getId());
-        String serv = ProcessRequest.start(hm,"relations");
+        Map<String, String> relationMap = new HashMap<>();
+        try {
+            hm.put("identifiant", User.getId());
+            String serv = ProcessRequest.start(hm, "relations");
 
-        JSONObject response = new JSONObject(serv);
+            JSONObject response = new JSONObject(serv);
 
-        JSONArray responseArray = response.getJSONArray("relations");
-        for ( int i = 0; i < responseArray.length(); i++ ) {
-            JSONObject relation = responseArray.getJSONObject(i);
-            String relation_id = String.valueOf(relation.getInt("relation"));
-            String relation_identite = relation.getString("identite");
-            relationMap.put(relation_id,relation_identite);
+            JSONArray responseArray = response.getJSONArray("relations");
+            for ( int i = 0; i < responseArray.length(); i++ ) {
+                JSONObject relation = responseArray.getJSONObject(i);
+                String relation_id = String.valueOf(relation.getInt("relation"));
+                String relation_identite = relation.getString("identite");
+                relationMap.put(relation_id, relation_identite);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         return relationMap;
     }
 
-    public Boolean sendMessage(String relation_id, String message) throws IOException {
+    public static Boolean sendMessage(String relation_id, String message) throws IOException {
         Map<String, String> hm = new HashMap<>();
         hm.put( "identifiant", User.getId());
         hm.put( "relation",relation_id);
@@ -98,7 +102,7 @@ public class UserAction {
         return param_message.contains("OK");
     }
 
-    public Map<String, String> readMessage(String relation_id) throws IOException {
+    public static Map<String, String> readMessage(String relation_id) throws IOException {
         Map<String, String> hm = new HashMap<>();
         Map<String, String> messageMap = new HashMap<>();
         hm.put( "identifiant", User.getId());
