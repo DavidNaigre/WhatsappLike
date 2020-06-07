@@ -49,6 +49,9 @@ public class ChatView implements Initializable {
     @FXML private Pane startPane, titleBar, newRelationPane;
     private double xOffset,yOffset;
     private String contactId = "";
+
+    private Map<String, String> initContactList;
+
     private int nbrOfContact;
     private static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private final int THREADS_NUMBER_ALLOW = 2;
@@ -109,18 +112,21 @@ public class ChatView implements Initializable {
             scrollPane.layout();
             scrollPane.setVvalue(1D);
         });
-        nbrOfContact = updateContactList();
-       pool.scheduleAtFixedRate(()->{
-            int tempNbrOfContact = updateContactList();
+        initContactList = updateContactList();
+        nbrOfContact = initContactList.size();
+        pool.scheduleAtFixedRate(()->{
+            int tempNbrOfContact = updateContactList().size();
             if(tempNbrOfContact > nbrOfContact) System.out.println((tempNbrOfContact - nbrOfContact)+" contact add");
             else if(tempNbrOfContact < nbrOfContact) System.out.println((nbrOfContact - tempNbrOfContact)+" contact removed");
             nbrOfContact = tempNbrOfContact;
-        },0,2000, TimeUnit.MILLISECONDS);
-
+        },2000,2000, TimeUnit.MILLISECONDS);
         pool.scheduleAtFixedRate(()->{
             if(!contactId.isEmpty()){
-                Map<String,String> messageList = UserAction.readMessage(contactId);
-                messageList.forEach(this::updateMSG);
+                ArrayList<ArrayList<String>> messageList = UserAction.readMessage(contactId);
+                for(ArrayList<String> message : messageList){
+                    updateMSG(message.get(0), message.get(1));
+                    HistoryBuilder.write(contactId,message.get(0), message.get(1));
+                }
             }
         },1000, 1000, TimeUnit.MILLISECONDS);
     }
@@ -133,100 +139,100 @@ public class ChatView implements Initializable {
 
     public void handleSendMessageClick(ActionEvent actionEvent) {
         String message = messageInput.getText().trim();
-        if(!message.isEmpty() && updateMSG(userName.getText(),message)) {
-            UserAction.sendMessage(contactId, message);
-            HistoryBuilder.write(userName.getText(), contactName.getText(), message);
-        }
+        UserAction.sendMessage(contactId, message);
         messageInput.clear();
     }
 
     public boolean updateMSG(String username, String message) {
-        Text text = new Text(message);
-        text.setFill(Color.BLACK);
-        text.getStyleClass().add("message");
-        TextFlow tempFlow = new TextFlow();
-
-        tempFlow.getChildren().add(text);
-        tempFlow.setMaxWidth(400);
-        TextFlow flow = new TextFlow(tempFlow);
-        HBox hbox = new HBox(12);
-
-        if(!User.getIdentifiant().equals(username)) {
-            tempFlow.getStyleClass().add("tempFlowFlipped");
-            flow.getStyleClass().add("textFlowFlipped");
-            chatBox.setAlignment(Pos.TOP_LEFT);
-            hbox.setAlignment(Pos.CENTER_LEFT);
-        } else {
+            Text text = new Text(message);
             text.setFill(Color.BLACK);
-            tempFlow.getStyleClass().add("tempFlow");
-            flow.getStyleClass().add("textFlow");
-            hbox.setAlignment(Pos.BOTTOM_RIGHT);
-        }
-        hbox.getChildren().add(flow);
-        hbox.getStyleClass().add("hbox");
-        Platform.runLater(()-> chatBox.getChildren().addAll(hbox));
-        return true;
+            text.getStyleClass().add("message");
+            TextFlow tempFlow = new TextFlow();
+
+            tempFlow.getChildren().add(text);
+            tempFlow.setMaxWidth(400);
+            TextFlow flow = new TextFlow(tempFlow);
+            HBox hbox = new HBox(12);
+
+            if (!User.getIdentifiant().equals(username)) {
+                tempFlow.getStyleClass().add("tempFlowFlipped");
+                flow.getStyleClass().add("textFlowFlipped");
+                chatBox.setAlignment(Pos.TOP_LEFT);
+                hbox.setAlignment(Pos.CENTER_LEFT);
+            } else {
+                text.setFill(Color.BLACK);
+                tempFlow.getStyleClass().add("tempFlow");
+                flow.getStyleClass().add("textFlow");
+                hbox.setAlignment(Pos.BOTTOM_RIGHT);
+            }
+            hbox.getChildren().add(flow);
+            hbox.getStyleClass().add("hbox");
+            Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
+            return true;
     }
 
-    private int updateContactList() {
+    private Map<String, String> updateContactList() {
         Map<String, String> contactList = UserAction.getListRelation();
-        Platform.runLater(() -> clientListBox.getChildren().clear());
-        for ( Map.Entry<String, String> entry : contactList.entrySet() ) {
-            String id = entry.getKey();
-            String name = entry.getValue();
+        if (!contactList.equals(initContactList)) {
+            Platform.runLater(() -> clientListBox.getChildren().clear());
+            for ( Map.Entry<String, String> entry : contactList.entrySet() ) {
+                String id = entry.getKey();
+                String name = entry.getValue();
 
-            if (name.equals(this.userName.getText())) continue;
-            HBox container = new HBox();
-            container.setAlignment(Pos.CENTER);
-            container.setSpacing(20);
-            container.setPrefWidth(clientListBox.getPrefWidth());
-            container.setPadding(new Insets(10));
-            container.getStyleClass().add("online-user-container");
-            //Photo de profile
-            Circle img = new Circle(60, 60, 30);
-            try {
-                var path = new File(String.format("src/ui/ressources/profile/%s.png", name)).toURI().toString();
-                URL imgUrl = getClass().getResource(path);
-                if (imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
-                img.setFill(new ImagePattern(new Image(path)));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            container.getChildren().add(img);
+                if (name.equals(this.userName.getText())) continue;
+                HBox container = new HBox();
+                container.setAlignment(Pos.CENTER);
+                container.setSpacing(20);
+                container.setPrefWidth(clientListBox.getPrefWidth());
+                container.setPadding(new Insets(10));
+                container.getStyleClass().add("online-user-container");
+                //Photo de profile
+                Circle img = new Circle(60, 60, 30);
+                try {
+                    var path = new File(String.format("src/ui/ressources/profile/%s.png", name)).toURI().toString();
+                    URL imgUrl = getClass().getResource(path);
+                    if (imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
+                    img.setFill(new ImagePattern(new Image(path)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                container.getChildren().add(img);
 
-            //Nom contact
-            VBox userDetailContainer = new VBox();
-            userDetailContainer.setPrefWidth(clientListBox.getPrefWidth() / 1.5);
-            Label lblUsername = new Label(name);
-            lblUsername.getStyleClass().add("online-label");
-            userDetailContainer.getChildren().add(lblUsername);
+                //Nom contact
+                VBox userDetailContainer = new VBox();
+                userDetailContainer.setPrefWidth(clientListBox.getPrefWidth() / 1.5);
+                Label lblUsername = new Label(name);
+                lblUsername.getStyleClass().add("online-label");
+                userDetailContainer.getChildren().add(lblUsername);
 
 
-            //TODO : refaire le truc de last message
+                //TODO : refaire le truc de last message
 //            ArrayList<ArrayList<String>> history = new ArrayList<>(HistoryBuilder.read(name));
 //            String lastMessage = history.size() > 0 ? history.get(history.size() - 1).get(2) : "";
 
-            //Dernier message
-            Label lblname = new Label("");
-            lblname.getStyleClass().add("online-label-details");
-            userDetailContainer.getChildren().add(lblname);
-            container.getChildren().add(userDetailContainer);
+                //Dernier message
+                Label lblname = new Label("");
+                lblname.getStyleClass().add("online-label-details");
+                userDetailContainer.getChildren().add(lblname);
+                container.getChildren().add(userDetailContainer);
 
-            //Option
-            Label settings = new Label("...");
-            settings.getStyleClass().add("online-settings");
-            container.getChildren().add(settings);
+                //Option
+                Label settings = new Label("...");
+                settings.getStyleClass().add("online-settings");
+                container.getChildren().add(settings);
 
-            container.setOnMouseClicked(e -> {
-                startPane.setVisible(false);
-                startPane.setDisable(true);
-                clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
-                container.getStyleClass().add("online-user-container-active");
-                changeChat(lblUsername.getText(), id);
-            });
-            Platform.runLater(() -> clientListBox.getChildren().add(container));
+                container.setOnMouseClicked(e -> {
+                    startPane.setVisible(false);
+                    startPane.setDisable(true);
+                    clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
+                    container.getStyleClass().add("online-user-container-active");
+                    changeChat(lblUsername.getText(), id);
+                });
+                Platform.runLater(() -> clientListBox.getChildren().add(container));
+            }
+            initContactList = contactList;
         }
-        return contactList.size();
+        return contactList;
     }
 
     public void changeChat(String to, String id){
@@ -242,7 +248,7 @@ public class ChatView implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(to));
+        ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(contactId));
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
     }
 

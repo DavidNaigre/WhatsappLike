@@ -1,13 +1,15 @@
 package function.user;
 
 import function.ProcessRequest;
-import function.messages.HistoryBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class UserAction {
     public static boolean createAccount(String identifiant, String email){
@@ -102,6 +104,7 @@ public class UserAction {
     public static Boolean sendMessage(String relation_id, String message) {
         Map<String, String> hm = new HashMap<>();
         try {
+            message = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
             hm.put("identifiant", User.getId());
             hm.put("relation", relation_id);
             hm.put("message", message);
@@ -110,33 +113,32 @@ public class UserAction {
 
             String param_message = response.getJSONObject("etat").getString("message");
             return param_message.contains("OK");
-        } catch (JSONException e) {
+        } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    public static Map<String, String> readMessage(String contactID) {
+    public static ArrayList<ArrayList<String>> readMessage(String contactID) {
         Map<String, String> hm = new HashMap<>();
-        Map<String, String> messageMap = new HashMap<>();
+        ArrayList<ArrayList<String>> messageArray = new ArrayList<>();
         try {
             hm.put("identifiant", User.getId());
             hm.put("relation", contactID);
-
             String serv = ProcessRequest.start(hm, "lire");
-
             JSONObject response = new JSONObject(serv);
             JSONArray responseArray = response.getJSONArray("messages");
-            for ( int i = 0; i < responseArray.length(); i++ ) {
-                JSONObject relation = responseArray.getJSONObject(i);
-                String message = relation.getString("message");
-                String identite = relation.getString("identite");
-                messageMap.put(identite, message);
-                HistoryBuilder.write(identite,User.getIdentifiant(),message);
+            for( Iterator<Object> i = responseArray.iterator(); i.hasNext();){
+                JSONObject item = (JSONObject) i.next();
+                messageArray.add(new ArrayList<>(){{
+                    add(item.getString("identite"));
+                    add(URLDecoder.decode(item.getString("message"), StandardCharsets.UTF_8.toString()));
+                }});
             }
-        } catch (JSONException e) {
+//            Collections.reverse(messageArray);
+        } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return messageMap;
+        return messageArray;
     }
 }

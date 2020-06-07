@@ -12,10 +12,10 @@ import java.util.Date;
 import java.util.Map;
 
 public class HistoryBuilder {
-    public static ArrayList<ArrayList<String>> read(String to){
+    public static ArrayList<ArrayList<String>> read(String contactID){
         ArrayList<ArrayList<String>> data = new ArrayList<>();
         JSONParser parser = new JSONParser();
-        try(FileReader file = new FileReader("src/function/messages/History/"+to+".json"))  {
+        try(FileReader file = new FileReader("src/function/messages/History/"+contactID+".json"))  {
             Object obj = parser.parse(file);
             JSONArray jsonArray = (JSONArray) obj;
             for(Object jsonData: jsonArray){
@@ -32,18 +32,18 @@ public class HistoryBuilder {
         return data;
     }
 
-    public static boolean write(String from, String to , String message) {
+    public static boolean write(String contactID, String from, String message) {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         JSONArray historyArray = new JSONArray();
         try {
             JSONParser parser = new JSONParser();
-            try (FileReader file = new FileReader("src/function/messages/History/" + to + ".json")) {
+            try (FileReader file = new FileReader("src/function/messages/History/" + contactID + ".json")) {
                 Object obj = parser.parse(file);
                 JSONArray jsonArray = (JSONArray) obj;
                 if (!jsonArray.isEmpty()) historyArray = jsonArray;
             } catch (FileNotFoundException e) {
-                System.out.println(to + ".json will be created");
+                System.out.println(contactID + ".json will be created");
             }
 
             JSONObject obj = new JSONObject();
@@ -52,7 +52,7 @@ public class HistoryBuilder {
             obj.put("message", message);
             historyArray.add(obj);
 
-            try (FileWriter file = new FileWriter("src/function/messages/History/" + to + ".json", false)) {
+            try (FileWriter file = new FileWriter("src/function/messages/History/" + contactID + ".json", false)) {
                 file.write(historyArray.toString());
                 file.flush();
                 return true;
