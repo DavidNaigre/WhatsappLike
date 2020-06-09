@@ -32,7 +32,7 @@ public class HistoryBuilder {
         return data;
     }
 
-    public static boolean write(String contactID, String from, String message) {
+    public static void write(String contactID, String from, String message) {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         JSONArray historyArray = new JSONArray();
@@ -55,20 +55,11 @@ public class HistoryBuilder {
             try (FileWriter file = new FileWriter("src/function/messages/History/" + contactID + ".json", false)) {
                 file.write(historyArray.toString());
                 file.flush();
-                return true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        return false;
-    }
-
-    public static ArrayList<String> getContactList(){
-        ArrayList<String> result = new ArrayList<>();
-        File[] files = new File("src/function/messages/history").listFiles();
-        for (File file: files != null ? files : new File[0] ) result.add(file.getName().substring(0, file.getName().length() - 5));
-        return result;
     }
 }

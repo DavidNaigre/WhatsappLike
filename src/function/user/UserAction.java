@@ -5,11 +5,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserAction {
     public static boolean createAccount(String identifiant, String email){
@@ -25,26 +26,6 @@ public class UserAction {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public static boolean getParameters(String id) {
-        Map<String, String> hm = new HashMap<>();
-        hm.put( "identifiant",id);
-        String serv = ProcessRequest.start(hm,"information");
-
-        JSONObject response = new JSONObject(serv);
-        try {
-            String param_identite = response.getString("identite");
-            String param_mail2 = response.getString("mail");
-            String param_id2 = response.getString("identifiant");
-            User.setIdentifiant(param_identite);
-            User.setMail(param_mail2);
-            User.setId(param_id2);
-            return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     public static boolean newRelation(String email) {
@@ -64,7 +45,7 @@ public class UserAction {
         return false;
     }
 
-    public static boolean delRelation(String email) {
+    public static void delRelation(String email) {
         Map<String, String> hm = new HashMap<>();
         try {
             hm.put("identifiant", User.getId());
@@ -73,11 +54,9 @@ public class UserAction {
             JSONObject response = new JSONObject(serv);
 
             String param_message = response.getJSONObject("etat").getString("message");
-            return param_message.contains("OK");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
     public static Map<String, String> getListRelation(){
@@ -101,22 +80,19 @@ public class UserAction {
         return relationMap;
     }
 
-    public static Boolean sendMessage(String relation_id, String message) {
+    public static void sendMessage(String relation_id, String message) {
         Map<String, String> hm = new HashMap<>();
         try {
-            message = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
+            message = URLEncoder.encode(ProcessRequest.encode(message), StandardCharsets.UTF_8);
             hm.put("identifiant", User.getId());
             hm.put("relation", relation_id);
             hm.put("message", message);
             String serv = ProcessRequest.start(hm, "ecrire");
             JSONObject response = new JSONObject(serv);
-
             String param_message = response.getJSONObject("etat").getString("message");
-            return param_message.contains("OK");
-        } catch (JSONException | UnsupportedEncodingException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
     public static ArrayList<ArrayList<String>> readMessage(String contactID) {
@@ -128,15 +104,15 @@ public class UserAction {
             String serv = ProcessRequest.start(hm, "lire");
             JSONObject response = new JSONObject(serv);
             JSONArray responseArray = response.getJSONArray("messages");
-            for( Iterator<Object> i = responseArray.iterator(); i.hasNext();){
-                JSONObject item = (JSONObject) i.next();
-                messageArray.add(new ArrayList<>(){{
+            for ( Object o : responseArray ) {
+                JSONObject item = (JSONObject) o;
+                messageArray.add(new ArrayList<>() {{
                     add(item.getString("identite"));
-                    add(URLDecoder.decode(item.getString("message"), StandardCharsets.UTF_8.toString()));
+                    add(URLDecoder.decode(ProcessRequest.decode(item.getString("message")), StandardCharsets.UTF_8));
                 }});
             }
 //            Collections.reverse(messageArray);
-        } catch (JSONException | UnsupportedEncodingException e) {
+        } catch (JSONException  e) {
             e.printStackTrace();
         }
         return messageArray;

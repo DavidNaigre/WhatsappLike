@@ -5,7 +5,6 @@ import function.user.User;
 import function.user.UserAction;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -43,10 +42,10 @@ public class ChatView implements Initializable {
     @FXML private TextField searchInput, messageInput, newContactInput;
     @FXML private TextFlow serverReponseBox;
     @FXML private Text errorMessageMail, serverReponseText;
-    @FXML private Label userName, contactName;
+    @FXML private Label userName, contactName, concactNameDeleteLabel;
     @FXML private ImageView userImageProfile, contactImageProfile;
     @FXML private Button sendButton, closeButton, reduceButton, newContactSend;
-    @FXML private Pane startPane, titleBar, newRelationPane;
+    @FXML private Pane startPane, titleBar, newRelationPane, overlayPane;
     private double xOffset,yOffset;
     private String contactId = "";
 
@@ -54,6 +53,9 @@ public class ChatView implements Initializable {
 
     private int nbrOfContact;
     private static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_BOLD = Pattern.compile("^(.*)(_)([a-zA-Z0-9 ëËêÊéÉÈèâÂäÄàÀ&\\/^#$,:.;|?!§*\\+\\-\\(){}]+)(_)(.*)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_ITALIC = Pattern.compile("^(.*)(£)([a-zA-Z0-9 ëËêÊéÉÈèâÂäÄàÀ&\\/^#$,:.;|?!§*\\+\\-\\(){}]+)(£)(.*)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_CROSS = Pattern.compile("^(.*)(~)([a-zA-Z0-9 ëËêÊéÉÈèâÂäÄàÀ&\\/^#$,:.;|?!§*\\+\\-\\(){}]+)(~)(.*)$", Pattern.CASE_INSENSITIVE);
     private final int THREADS_NUMBER_ALLOW = 2;
     private final  ScheduledExecutorService pool = Executors.newScheduledThreadPool(THREADS_NUMBER_ALLOW);
 
@@ -123,27 +125,27 @@ public class ChatView implements Initializable {
         pool.scheduleAtFixedRate(()->{
             if(!contactId.isEmpty()){
                 ArrayList<ArrayList<String>> messageList = UserAction.readMessage(contactId);
-                for(ArrayList<String> message : messageList){
+                messageList.forEach(message -> {
                     updateMSG(message.get(0), message.get(1));
-                    HistoryBuilder.write(contactId,message.get(0), message.get(1));
-                }
+                    HistoryBuilder.write(contactId, message.get(0), message.get(1));
+                });
             }
         },1000, 1000, TimeUnit.MILLISECONDS);
     }
 
-    public void handleEnterSearchKeyReleased(ActionEvent actionEvent) {
+    public void handleEnterSearchKeyReleased() {
         String message = searchInput.getText().trim();
         updateMSG(User.getIdentifiant(),message);
         searchInput.setText("");
     }
 
-    public void handleSendMessageClick(ActionEvent actionEvent) {
+    public void handleSendMessageClick() {
         String message = messageInput.getText().trim();
         UserAction.sendMessage(contactId, message);
         messageInput.clear();
     }
 
-    public boolean updateMSG(String username, String message) {
+    public void updateMSG(String username, String message) {
             Text text = new Text(message);
             text.setFill(Color.BLACK);
             text.getStyleClass().add("message");
@@ -168,7 +170,6 @@ public class ChatView implements Initializable {
             hbox.getChildren().add(flow);
             hbox.getStyleClass().add("hbox");
             Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
-            return true;
     }
 
     private Map<String, String> updateContactList() {
@@ -216,11 +217,6 @@ public class ChatView implements Initializable {
                 userDetailContainer.getChildren().add(lblname);
                 container.getChildren().add(userDetailContainer);
 
-                //Option
-                Label settings = new Label("...");
-                settings.getStyleClass().add("online-settings");
-                container.getChildren().add(settings);
-
                 container.setOnMouseClicked(e -> {
                     startPane.setVisible(false);
                     startPane.setDisable(true);
@@ -252,10 +248,7 @@ public class ChatView implements Initializable {
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
     }
 
-    public void handleOptionPaneButton(ActionEvent actionEvent) {
-    }
-
-    public void handleNewRelationButton(ActionEvent actionEvent) {
+    public void handleNewRelationButton() {
         if(!newRelationPane.isVisible()) {
             newRelationPane.setVisible(true);
             searchInput.setDisable(true);
@@ -266,13 +259,13 @@ public class ChatView implements Initializable {
         }
     }
 
-    public void handleNewContactCancel(ActionEvent actionEvent) {
+    public void handleNewContactCancel() {
         newRelationPane.setVisible(false);
         searchInput.setDisable(false);
         serverReponseBox.setVisible(false);
     }
 
-    public void handelNewContactSend(ActionEvent actionEvent) {
+    public void handelNewContactSend() {
         String mail = newContactInput.getText();
         if(!mail.isEmpty() && checkMail(mail)){
             Task task = new Task<Void>() {
@@ -297,13 +290,13 @@ public class ChatView implements Initializable {
         }
     }
 
-    public void closeBtn (ActionEvent actionEvent){
+    public void closeBtn(){
         pool.shutdown();
         Runtime.getRuntime().exit(0);
         ((Stage)closeButton.getScene().getWindow()).close();
     }
 
-    public void handleReduceButton(ActionEvent actionEvent) {
+    public void handleReduceButton() {
         ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
     }
 
@@ -311,4 +304,31 @@ public class ChatView implements Initializable {
         Matcher matcher = VALIDEMAIL.matcher(emailStr);
         return matcher.find();
     }
+
+    public void handleDeleteFriendButton() {
+        concactNameDeleteLabel.setText(contactName.getText());
+        overlayPane.setVisible(true);
+    }
+
+    public void handleDeleteFriendCancelButton() {
+        overlayPane.setVisible(false);
+    }
+
+    public void handleDeleteFriendSendButton() {
+        String target = null;
+        UserAction.delRelation(target);
+        try {
+            File file = new File("../../function/messages/history/"+target+".json");
+            if(file.delete()) overlayPane.setVisible(false);
+            else System.out.println("Failed to delete the file");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public TextFlow styleBuilder (String message){
+        TextFlow textFlow = new TextFlow();
+        return textFlow;
+    }
 }
+

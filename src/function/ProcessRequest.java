@@ -26,15 +26,11 @@ public class ProcessRequest {
             int status = con.getResponseCode();
             if(status > 299){
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
+                while ((inputLine = in.readLine()) != null) content.append(inputLine);
                 in.close();
             } else {
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
+                while ((inputLine = in.readLine()) != null) content.append(inputLine);
                 in.close();
             }
             return content.toString();
@@ -45,5 +41,12 @@ public class ProcessRequest {
         finally {
             con.disconnect();
         }
+    }
+
+    public static String encode(String parameters){
+        return parameters.replaceAll("\"","01DQ").replaceAll("'","01SQ");
+    }
+    public static String decode(String parameters){
+        return parameters.replaceAll("01DQ","\"").replaceAll("01SQ", "'");
     }
 }
