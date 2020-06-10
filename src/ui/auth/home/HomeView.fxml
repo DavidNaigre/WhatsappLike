@@ -4,46 +4,62 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
-<?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane prefHeight="400.0" prefWidth="550.0" stylesheets="@HomeStyle.css" xmlns="http://javafx.com/javafx/11.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.auth.home.HomeController">
-    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#005e50" height="106.0" layoutY="-2.0" stroke="BLACK"
-               strokeType="INSIDE" strokeWidth="0.0" width="550.0"/>
-    <Pane layoutX="54.0" layoutY="29.0" prefHeight="342.0" prefWidth="443.0"
-          style="-fx-background-color: #fff; -fx-background-radius: 5px;">
-        <Label contentDisplay="CENTER" layoutX="57.0" layoutY="28.0" text="WHATSAPPLIKE" textAlignment="CENTER"/>
-        <VBox alignment="CENTER" layoutX="44.0" layoutY="114.0">
+<AnchorPane prefHeight="500.0" prefWidth="453.0" stylesheets="@../authStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.auth.home.HomeController">
+    <Pane layoutX="56.0" layoutY="61.0" prefHeight="415.0" prefWidth="345.0" style="-fx-background-color: #fff; -fx-background-radius: 5px;">
+        <VBox alignment="CENTER" layoutX="47.0" layoutY="45.0">
             <opaqueInsets>
-                <Insets/>
+                <Insets />
             </opaqueInsets>
-            <Button fx:id="currentSession" mnemonicParsing="false" onAction="#handleSameAccountButtonClick"
-                    prefHeight="80.0" prefWidth="281.0" textAlignment="CENTER" wrapText="true">
+            <ImageView fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" styleClass="logo">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets bottom="20.0"/>
+                </VBox.margin>
+                <Image url="@../../ressources/images/logo150X150.png"/>
+            </ImageView>
+            <Button fx:id="currentSession" mnemonicParsing="false" onAction="#handleSameAccountButtonClick" prefHeight="70.0" prefWidth="250.0" styleClass="button-home" textAlignment="CENTER" wrapText="true">
+                <VBox.margin>
+                    <Insets />
                 </VBox.margin>
                 <cursor>
-                    <Cursor fx:constant="HAND"/>
+                    <Cursor fx:constant="HAND" />
                 </cursor>
             </Button>
-            <Line endX="100.0" opacity="0.4" startX="-254.05349731445312" startY="0.4142311215400696">
+            <Line endX="-3.7606048583984375" endY="0.41412973403930664" opacity="0.19" startX="-254.05349731445312" startY="0.4142311215400696">
                 <VBox.margin>
-                    <Insets bottom="20.0" top="20.0"/>
+                    <Insets bottom="7.0" top="7.0" />
                 </VBox.margin>
             </Line>
-            <Button mnemonicParsing="false" onAction="#handleNewAccountButtonClick" prefHeight="80.0"
-                    prefWidth="282.0" text="Nouvelle connexion">
+            <Button mnemonicParsing="false" onAction="#handleNewAccountButtonClick" prefHeight="70.0" prefWidth="250.0" styleClass="button-home" text="Créer un compte">
                 <VBox.margin>
-                    <Insets/>
+                    <Insets />
                 </VBox.margin>
                 <cursor>
-                    <Cursor fx:constant="HAND"/>
+                    <Cursor fx:constant="HAND" />
                 </cursor>
             </Button>
         </VBox>
+    </Pane>
+    <Pane fx:id="titleBar" prefHeight="35.0" prefWidth="456.0" styleClass="window-bar">
+        <Label layoutX="14.0" layoutY="7.0" prefHeight="21.0" prefWidth="88.0" styleClass="app-title" text="WhatsAppLike" />
+        <HBox alignment="CENTER" layoutX="375.0" layoutY="-2.0" prefHeight="35.0" prefWidth="81.0">
+            <Button fx:id="reduceButton" mnemonicParsing="false" onAction="#handleReduceButton" prefHeight="35.0" prefWidth="35.0" styleClass="title-bar-button" text="-">
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeBtn" prefHeight="35.0" prefWidth="35.0" styleClass="title-bar-button" text="x">
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+        </HBox>
     </Pane>
 </AnchorPane>

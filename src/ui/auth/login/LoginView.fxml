@@ -9,40 +9,46 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="400.0" prefWidth="550.0" stylesheets="@LoginStyle.css" xmlns="http://javafx.com/javafx/11.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.auth.login.LoginController">
-    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#005e50" height="106.0" layoutY="-2.0" stroke="BLACK"
-               strokeType="INSIDE" strokeWidth="0.0" width="550.0"/>
-    <Pane layoutX="54.0" layoutY="29.0" prefHeight="342.0" prefWidth="443.0"
-          style="-fx-background-color: #fff; -fx-background-radius: 5px;">
-        <Pane layoutX="40.0" layoutY="79.0" prefHeight="73.0" prefWidth="364.0"
-              style="-fx-background-color: #cce5ff; -fx-border-color: #b8daff; -fx-border-radius: 5px; -fx-background-radius: 5px;">
-            <Text fill="#004085" layoutX="9.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                  text="Un mail d'activation vous a été envoyé. Après avoir cliqué sur le lien d'activation, veuillez saisir l'identifiant fournit."
-                  textAlignment="JUSTIFY" wrappingWidth="346.0">
+<AnchorPane prefHeight="500.0" prefWidth="750.0" stylesheets="@../authStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.auth.login.LoginController">
+
+    <Pane layoutX="126.0" layoutY="89.0" prefHeight="360.0" prefWidth="499.0" style="-fx-background-color: #fff; -fx-background-radius: 5px;">
+        <Pane layoutX="68.0" layoutY="95.0" prefHeight="73.0" prefWidth="364.0" style="-fx-background-color: #cce5ff; -fx-border-color: #b8daff; -fx-border-radius: 5px; -fx-background-radius: 5px;">
+            <Text fill="#004085" layoutX="9.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Un mail d'activation vous a été envoyé. Après avoir cliqué sur le lien d'activation, veuillez saisir l'identifiant fournit." textAlignment="JUSTIFY" wrappingWidth="346.0">
                 <font>
-                    <Font name="Roboto Regular" size="14.0"/>
+                    <Font name="Roboto Regular" size="14.0" />
                 </font>
             </Text>
         </Pane>
-        <Label contentDisplay="CENTER" layoutX="116.0" layoutY="28.0" text="INSCRIPTION" textAlignment="CENTER"/>
-        <HBox alignment="CENTER" layoutX="116.0" layoutY="281.0" prefHeight="41.0" prefWidth="212.0">
-            <Hyperlink contentDisplay="CENTER" onAction="#handleBackButtonAction" text="&lt; annuler"/>
-            <Button mnemonicParsing="false" onAction="#handleCreateAccountButtonAction" prefHeight="21.0"
-                    prefWidth="114.0" text="valider">
+        <Label contentDisplay="CENTER" layoutX="139.0" layoutY="14.0" styleClass="label-page-title" text="INSCRIPTION" textAlignment="CENTER" />
+        <HBox alignment="CENTER" layoutX="144.0" layoutY="300.0" prefHeight="41.0" prefWidth="212.0">
+            <Hyperlink contentDisplay="CENTER" onAction="#handleBackButtonAction" text="&lt; annuler" />
+            <Button mnemonicParsing="false" onAction="#handleCreateAccountButtonAction" prefHeight="21.0" prefWidth="114.0" styleClass="button-send" text="valider">
                 <HBox.margin>
-                    <Insets left="10.0"/>
+                    <Insets left="10.0" />
                 </HBox.margin>
                 <cursor>
-                    <Cursor fx:constant="HAND"/>
+                    <Cursor fx:constant="HAND" />
                 </cursor>
             </Button>
         </HBox>
-        <TextArea fx:id="idTextarea" layoutX="33.0" layoutY="164.0" prefHeight="85.0" prefWidth="378.0"
-                  promptText="identifiant"/>
+        <TextArea fx:id="idTextarea" layoutX="61.0" layoutY="174.0" prefHeight="85.0" prefWidth="378.0" promptText="identifiant" />
+    </Pane>
+    <Pane fx:id="titleBar" prefHeight="35.0" prefWidth="750.0" styleClass="window-bar">
+        <Label layoutX="14.0" layoutY="7.0" prefHeight="21.0" prefWidth="88.0" styleClass="app-title" text="WhatsAppLike" />
+        <HBox alignment="CENTER" layoutX="669.0" layoutY="-2.0" prefHeight="35.0" prefWidth="81.0">
+            <Button fx:id="reduceButton" mnemonicParsing="false" onAction="#handleReduceButton" prefHeight="35.0" prefWidth="35.0" styleClass="title-bar-button" text="-">
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeBtn" prefHeight="35.0" prefWidth="35.0" styleClass="title-bar-button" text="x">
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+        </HBox>
     </Pane>
 </AnchorPane>

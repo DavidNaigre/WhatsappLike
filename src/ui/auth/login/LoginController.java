@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -19,11 +20,21 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML private TextArea idTextarea;
-    @FXML private Button closeButton;
+    @FXML private Button closeButton, reduceButton;
+    @FXML private Pane titleBar;
+    private double xOffset,yOffset;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         idTextarea.textProperty().addListener((a,z,e)-> System.out.println(e));
+        titleBar.setOnMousePressed(e -> {
+            xOffset = e.getSceneX();
+            yOffset = e.getSceneY();
+        });
+        titleBar.setOnMouseDragged(e -> {
+            titleBar.getScene().getWindow().setX(e.getScreenX() - xOffset);
+            titleBar.getScene().getWindow().setY(e.getScreenY() - yOffset);
+        });
     }
 
     public void handleBackButtonAction(ActionEvent actionEvent) throws IOException {
@@ -31,6 +42,7 @@ public class LoginController implements Initializable {
         Scene homeScene = new Scene(home);
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         window.setScene(homeScene);
+        window.centerOnScreen();
         window.show();
     }
 
@@ -42,12 +54,17 @@ public class LoginController implements Initializable {
                 Scene homeScene = new Scene(home);
                 Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
                 window.setScene(homeScene);
+                window.centerOnScreen();
                 window.show();
             }
         }
     }
-    public void closeBtn (ActionEvent actionEvent){
+    public void closeBtn(){
         Runtime.getRuntime().exit(0);
         ((Stage)closeButton.getScene().getWindow()).close();
+    }
+
+    public void handleReduceButton() {
+        ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
     }
 }

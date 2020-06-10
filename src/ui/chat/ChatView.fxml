@@ -65,7 +65,7 @@
       <Pane prefHeight="65.0" prefWidth="435.0" styleClass="top-bar">
          <ImageView fx:id="userImageProfile" fitHeight="50.0" fitWidth="50.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
          <Label fx:id="userName" layoutX="75.0" layoutY="16.0" styleClass="name-label" text="Label" />
-         <Button fx:id="newRelationButton" alignment="TOP_LEFT" layoutX="358.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleNewRelationButton" styleClass="menu-button" text="+">
+         <Button fx:id="newRelationButton" alignment="TOP_LEFT" layoutX="398.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleNewRelationButton" styleClass="menu-button" text="+">
             <cursor>
                <Cursor fx:constant="HAND" />
             </cursor>
@@ -91,7 +91,7 @@
          </AnchorPane>
       </ScrollPane>
    </Pane>
-   <Pane fx:id="startPane" layoutX="435.0" layoutY="35.0" prefHeight="765.0" prefWidth="845.0" styleClass="start-pane" visible="false">
+   <Pane fx:id="startPane" layoutX="435.0" layoutY="35.0" prefHeight="765.0" prefWidth="845.0" styleClass="start-pane">
       <Text layoutX="311.0" layoutY="570.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="creator-name" text="WhatsAppLike - By David NAIGRE" textAlignment="CENTER" />
    </Pane>
    <Pane fx:id="newRelationPane" layoutY="100.0" prefHeight="700.0" prefWidth="435.0" styleClass="new-contact-pane" visible="false">

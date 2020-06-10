@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -16,11 +17,20 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
-    @FXML private Button currentSession, closeButton;
-
+    @FXML private Button currentSession, closeButton, reduceButton;
+    @FXML private Pane titleBar;
+    private double xOffset,yOffset;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        currentSession.setText("Se connecter en tant que "+ User.getIdentifiant());
+        currentSession.setText(User.getIdentifiant());
+        titleBar.setOnMousePressed(e -> {
+            xOffset = e.getSceneX();
+            yOffset = e.getSceneY();
+        });
+        titleBar.setOnMouseDragged(e -> {
+            titleBar.getScene().getWindow().setX(e.getScreenX() - xOffset);
+            titleBar.getScene().getWindow().setY(e.getScreenY() - yOffset);
+        });
     }
 
     public void handleSameAccountButtonClick(ActionEvent actionEvent) throws IOException {
@@ -37,11 +47,15 @@ public class HomeController implements Initializable {
         Scene homeScene = new Scene(home);
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         window.setScene(homeScene);
+        window.centerOnScreen();
         window.show();
     }
 
-    public void closeBtn (ActionEvent actionEvent){
+    public void closeBtn(){
         Runtime.getRuntime().exit(0);
         ((Stage)closeButton.getScene().getWindow()).close();
+    }
+    public void handleReduceButton() {
+        ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
     }
 }

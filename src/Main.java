@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
@@ -29,14 +30,12 @@ public class Main extends Application {
             if(checkAuth) primaryStage.setScene(loginScene);
             else primaryStage.setScene(createScene);
 
-            primaryStage.setTitle("Not WhatsApp");
-            primaryStage.getIcons().add(new Image("./ui/ressources/images/favicon.png"));
+            primaryStage.getIcons().add(new Image("./ui/ressources/images/logo150X150.png"));
             primaryStage.setResizable(false);
             primaryStage.centerOnScreen();
-//            primaryStage.initStyle(StageStyle.UNDECORATED);
+            primaryStage.initStyle(StageStyle.UNDECORATED);
             primaryStage.show();
         } catch (IOException e) {
-            System.out.println("yop");
             e.printStackTrace();
         }
     }
