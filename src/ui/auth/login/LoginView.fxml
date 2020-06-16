@@ -16,7 +16,7 @@
 
     <Pane layoutX="126.0" layoutY="89.0" prefHeight="360.0" prefWidth="499.0" style="-fx-background-color: #fff; -fx-background-radius: 5px;">
         <Pane layoutX="68.0" layoutY="95.0" prefHeight="73.0" prefWidth="364.0" style="-fx-background-color: #cce5ff; -fx-border-color: #b8daff; -fx-border-radius: 5px; -fx-background-radius: 5px;">
-            <Text fill="#004085" layoutX="9.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Un mail d'activation vous a été envoyé. Après avoir cliqué sur le lien d'activation, veuillez saisir l'identifiant fournit." textAlignment="JUSTIFY" wrappingWidth="346.0">
+            <Text fx:id="alertText" fill="#004085" layoutX="9.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="346.0">
                 <font>
                     <Font name="Roboto Regular" size="14.0" />
                 </font>

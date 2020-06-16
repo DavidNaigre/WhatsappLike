@@ -67,7 +67,7 @@ public class ChatView implements Initializable {
             xOffset = e.getSceneX();
             yOffset = e.getSceneY();
         });
-        titleBar.setOnMouseDragged(e -> {
+    titleBar.setOnMouseDragged(e -> {
             titleBar.getScene().getWindow().setX(e.getScreenX() - xOffset);
             titleBar.getScene().getWindow().setY(e.getScreenY() - yOffset);
         });
@@ -117,10 +117,12 @@ public class ChatView implements Initializable {
         initContactList = updateContactList();
         nbrOfContact = initContactList.size();
         pool.scheduleAtFixedRate(()->{
-            int tempNbrOfContact = updateContactList().size();
-            if(tempNbrOfContact > nbrOfContact) System.out.println((tempNbrOfContact - nbrOfContact)+" contact add");
-            else if(tempNbrOfContact < nbrOfContact) System.out.println((nbrOfContact - tempNbrOfContact)+" contact removed");
-            nbrOfContact = tempNbrOfContact;
+            if (searchInput.getText().isEmpty()) {
+                int tempNbrOfContact = updateContactList().size();
+                if(tempNbrOfContact > nbrOfContact) System.out.println((tempNbrOfContact - nbrOfContact)+" contact add");
+                else if(tempNbrOfContact < nbrOfContact) System.out.println((nbrOfContact - tempNbrOfContact)+" contact removed");
+                nbrOfContact = tempNbrOfContact;
+            }
         },2000,2000, TimeUnit.MILLISECONDS);
         pool.scheduleAtFixedRate(()->{
             if(!contactId.isEmpty()){

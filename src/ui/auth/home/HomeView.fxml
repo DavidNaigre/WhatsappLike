@@ -10,41 +10,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Line?>
 
 <AnchorPane prefHeight="500.0" prefWidth="453.0" stylesheets="@../authStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.auth.home.HomeController">
     <Pane layoutX="56.0" layoutY="61.0" prefHeight="415.0" prefWidth="345.0" style="-fx-background-color: #fff; -fx-background-radius: 5px;">
-        <VBox alignment="CENTER" layoutX="47.0" layoutY="45.0">
+        <VBox fx:id="menuVbox" alignment="CENTER" layoutX="47.0" layoutY="45.0">
             <opaqueInsets>
                 <Insets />
             </opaqueInsets>
             <ImageView fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" styleClass="logo">
                 <VBox.margin>
-                    <Insets bottom="20.0"/>
+                    <Insets bottom="20.0" />
                 </VBox.margin>
-                <Image url="@../../ressources/images/logo150X150.png"/>
+                <Image url="@../../ressources/images/logo150X150.png" />
             </ImageView>
-            <Button fx:id="currentSession" mnemonicParsing="false" onAction="#handleSameAccountButtonClick" prefHeight="70.0" prefWidth="250.0" styleClass="button-home" textAlignment="CENTER" wrapText="true">
-                <VBox.margin>
-                    <Insets />
-                </VBox.margin>
-                <cursor>
-                    <Cursor fx:constant="HAND" />
-                </cursor>
-            </Button>
-            <Line endX="-3.7606048583984375" endY="0.41412973403930664" opacity="0.19" startX="-254.05349731445312" startY="0.4142311215400696">
-                <VBox.margin>
-                    <Insets bottom="7.0" top="7.0" />
-                </VBox.margin>
-            </Line>
-            <Button mnemonicParsing="false" onAction="#handleNewAccountButtonClick" prefHeight="70.0" prefWidth="250.0" styleClass="button-home" text="Créer un compte">
-                <VBox.margin>
-                    <Insets />
-                </VBox.margin>
-                <cursor>
-                    <Cursor fx:constant="HAND" />
-                </cursor>
-            </Button>
         </VBox>
     </Pane>
     <Pane fx:id="titleBar" prefHeight="35.0" prefWidth="456.0" styleClass="window-bar">

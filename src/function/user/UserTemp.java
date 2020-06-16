@@ -30,6 +30,24 @@ public class UserTemp {
         return false;
     }
 
+    public static boolean setParameters(String newid) {
+        Map<String, String> hm = new HashMap<>();
+        hm.put( "identifiant",newid);
+        String serv = ProcessRequest.start(hm,"information");
+
+        JSONObject response = new JSONObject(serv);
+        try {
+            id = response.getString("identite");
+            mail = response.getString("mail");
+            identifiant = response.getString("identifiant");
+            return true;
+
+        } catch (JSONException e) {
+            System.out.println("Identifiant saisie incorrect");
+        }
+        return false;
+    }
+
     public static void setId(String id) { UserTemp.id = id; }
     public static void setIdentifiant(String identifiant) {
         UserTemp.identifiant = identifiant;
