@@ -1,5 +1,6 @@
 package ui.chat;
 
+import function.TextConstructor;
 import function.messages.HistoryBuilder;
 import function.user.User;
 import function.user.UserAction;
@@ -53,9 +54,6 @@ public class ChatView implements Initializable {
 
     private int nbrOfContact;
     private static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern PATTERN_BOLD = Pattern.compile("^(.*)(_)([a-zA-Z0-9 ëËêÊéÉÈèâÂäÄàÀ&\\/^#$,:.;|?!§*\\+\\-\\(){}]+)(_)(.*)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern PATTERN_ITALIC = Pattern.compile("^(.*)(£)([a-zA-Z0-9 ëËêÊéÉÈèâÂäÄàÀ&\\/^#$,:.;|?!§*\\+\\-\\(){}]+)(£)(.*)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern PATTERN_CROSS = Pattern.compile("^(.*)(~)([a-zA-Z0-9 ëËêÊéÉÈèâÂäÄàÀ&\\/^#$,:.;|?!§*\\+\\-\\(){}]+)(~)(.*)$", Pattern.CASE_INSENSITIVE);
     private final int THREADS_NUMBER_ALLOW = 2;
     private final  ScheduledExecutorService pool = Executors.newScheduledThreadPool(THREADS_NUMBER_ALLOW);
 
@@ -148,12 +146,7 @@ public class ChatView implements Initializable {
     }
 
     public void updateMSG(String username, String message) {
-            Text text = new Text(message);
-            text.setFill(Color.BLACK);
-            text.getStyleClass().add("message");
-            TextFlow tempFlow = new TextFlow();
-
-            tempFlow.getChildren().add(text);
+            TextFlow tempFlow = TextConstructor.BOLD(message);
             tempFlow.setMaxWidth(400);
             TextFlow flow = new TextFlow(tempFlow);
             HBox hbox = new HBox(12);
@@ -164,7 +157,6 @@ public class ChatView implements Initializable {
                 chatBox.setAlignment(Pos.TOP_LEFT);
                 hbox.setAlignment(Pos.CENTER_LEFT);
             } else {
-                text.setFill(Color.BLACK);
                 tempFlow.getStyleClass().add("tempFlow");
                 flow.getStyleClass().add("textFlow");
                 hbox.setAlignment(Pos.BOTTOM_RIGHT);
@@ -326,11 +318,6 @@ public class ChatView implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public TextFlow styleBuilder (String message){
-        TextFlow textFlow = new TextFlow();
-        return textFlow;
     }
 }
 
