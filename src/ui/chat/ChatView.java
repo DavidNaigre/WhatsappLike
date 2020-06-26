@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -25,6 +26,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.net.URL;
@@ -51,7 +55,7 @@ public class ChatView implements Initializable {
     private String contactId = "";
 
     private Map<String, String> initContactList;
-
+    private boolean lastMessageThreadStop = true;
     private int nbrOfContact;
     private static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private final int THREADS_NUMBER_ALLOW = 2;
@@ -65,7 +69,7 @@ public class ChatView implements Initializable {
             xOffset = e.getSceneX();
             yOffset = e.getSceneY();
         });
-    titleBar.setOnMouseDragged(e -> {
+        titleBar.setOnMouseDragged(e -> {
             titleBar.getScene().getWindow().setX(e.getScreenX() - xOffset);
             titleBar.getScene().getWindow().setY(e.getScreenY() - yOffset);
         });
@@ -130,7 +134,41 @@ public class ChatView implements Initializable {
                     HistoryBuilder.write(contactId, message.get(0), message.get(1));
                 });
             }
-        },1000, 1000, TimeUnit.MILLISECONDS);
+        },500, 500, TimeUnit.MILLISECONDS);
+        pool.scheduleAtFixedRate(()->{
+            if(lastMessageThreadStop){
+                contactLastMessage();
+            }
+        },1000 ,1000, TimeUnit.MILLISECONDS);
+    }
+    public void contactLastMessage () {
+        System.out.println("IN LAST MESSAGE METHOD \n");
+        String state;
+        for ( Node child : clientListBox.getChildren() ){
+            String id = child.getId(), messageInfo = ((String) child.getUserData());
+            try {
+                JSONObject json = (JSONObject) new JSONParser().parse(messageInfo);
+                if(json.containsKey("message")) {
+                    String jsonLastMessage = (String) json.get("message");
+                    ArrayList<ArrayList<String>> messageList = UserAction.readMessage(id);
+                    messageList.forEach(message -> HistoryBuilder.write(id, message.get(0), message.get(1)));
+                    JSONObject jsonTemp = (JSONObject) new JSONParser().parse(HistoryBuilder.lastMessage(id));
+                    messageInfo = jsonTemp.toString();
+                    String lastMessage = (String) jsonTemp.get("message");
+                    if(child instanceof  HBox){
+                        if(messageList.size() > 0) state = "Nouveau message";
+                        else state = "";
+                        Label lblname = new Label(state);
+                        lblname.getStyleClass().add("online-label-details");
+                        Platform.runLater(() -> ((VBox)((HBox)child).getChildren().get(1)).getChildren().set(1,lblname));
+                    }
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            System.out.println(id+" : "+ messageInfo);
+        }
     }
 
     public void handleEnterSearchKeyReleased() {
@@ -146,27 +184,28 @@ public class ChatView implements Initializable {
     }
 
     public void updateMSG(String username, String message) {
-            TextFlow tempFlow = TextConstructor.BOLD(message);
-            tempFlow.setMaxWidth(400);
-            TextFlow flow = new TextFlow(tempFlow);
-            HBox hbox = new HBox(12);
+        TextFlow tempFlow = TextConstructor.BOLD(message);
+        tempFlow.setMaxWidth(400);
+        TextFlow flow = new TextFlow(tempFlow);
+        HBox hbox = new HBox(12);
 
-            if (!User.getIdentifiant().equals(username)) {
-                tempFlow.getStyleClass().add("tempFlowFlipped");
-                flow.getStyleClass().add("textFlowFlipped");
-                chatBox.setAlignment(Pos.TOP_LEFT);
-                hbox.setAlignment(Pos.CENTER_LEFT);
-            } else {
-                tempFlow.getStyleClass().add("tempFlow");
-                flow.getStyleClass().add("textFlow");
-                hbox.setAlignment(Pos.BOTTOM_RIGHT);
-            }
-            hbox.getChildren().add(flow);
-            hbox.getStyleClass().add("hbox");
-            Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
+        if (!User.getIdentifiant().equals(username)) {
+            tempFlow.getStyleClass().add("tempFlowFlipped");
+            flow.getStyleClass().add("textFlowFlipped");
+            chatBox.setAlignment(Pos.TOP_LEFT);
+            hbox.setAlignment(Pos.CENTER_LEFT);
+        } else {
+            tempFlow.getStyleClass().add("tempFlow");
+            flow.getStyleClass().add("textFlow");
+            hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        }
+        hbox.getChildren().add(flow);
+        hbox.getStyleClass().add("hbox");
+        Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
     }
 
     private Map<String, String> updateContactList() {
+        lastMessageThreadStop = false;
         Map<String, String> contactList = UserAction.getListRelation();
         if (!contactList.equals(initContactList)) {
             Platform.runLater(() -> clientListBox.getChildren().clear());
@@ -200,28 +239,38 @@ public class ChatView implements Initializable {
                 lblUsername.getStyleClass().add("online-label");
                 userDetailContainer.getChildren().add(lblUsername);
 
-
-                //TODO : refaire le truc de last message
-//            ArrayList<ArrayList<String>> history = new ArrayList<>(HistoryBuilder.read(name));
-//            String lastMessage = history.size() > 0 ? history.get(history.size() - 1).get(2) : "";
-
                 //Dernier message
+                String lastMessage = "", messageInfo = HistoryBuilder.lastMessage(id);
+                try {
+                    JSONParser parser = new JSONParser();
+                    JSONObject json = (JSONObject) parser.parse(messageInfo);
+                    lastMessage = json.containsKey("message") ? (String) json.get("message") : "";
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 Label lblname = new Label("");
                 lblname.getStyleClass().add("online-label-details");
                 userDetailContainer.getChildren().add(lblname);
                 container.getChildren().add(userDetailContainer);
 
                 container.setOnMouseClicked(e -> {
-                    startPane.setVisible(false);
-                    startPane.setDisable(true);
-                    clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
-                    container.getStyleClass().add("online-user-container-active");
-                    changeChat(lblUsername.getText(), id);
+                    if(!id.equals(contactId)) {
+                        startPane.setVisible(false);
+                        startPane.setDisable(true);
+                        lblname.setText("");
+                        clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
+                        container.getStyleClass().add("online-user-container-active");
+                        changeChat(lblUsername.getText(), id);
+                    }
                 });
+                container.setId(id);
+                container.setUserData(messageInfo);
                 Platform.runLater(() -> clientListBox.getChildren().add(container));
             }
             initContactList = contactList;
         }
+        lastMessageThreadStop = true;
         return contactList;
     }
 
@@ -309,14 +358,19 @@ public class ChatView implements Initializable {
     }
 
     public void handleDeleteFriendSendButton() {
-        String target = null;
-        UserAction.delRelation(target);
-        try {
-            File file = new File("../../function/messages/history/"+target+".json");
-            if(file.delete()) overlayPane.setVisible(false);
-            else System.out.println("Failed to delete the file");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(UserAction.delRelation(contactId)){
+            try {
+                File file = new File("../../function/messages/history/"+contactId+".json");
+                file.delete();
+                contactId = "";
+                contactName.setText("");
+                startPane.setVisible(true);
+                overlayPane.setVisible(false);
+                updateContactList();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

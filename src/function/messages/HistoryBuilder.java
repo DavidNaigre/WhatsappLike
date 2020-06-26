@@ -5,7 +5,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +33,25 @@ public class HistoryBuilder {
             System.out.println("Could not load history file: illegal structure");
         }
         return data;
+    }
+
+    public static String lastMessage(String relationID) {
+        String message = "", from = "";
+        ArrayList<String> messageInfo = new ArrayList();
+        JSONParser parser = new JSONParser();
+        JSONObject jsonObject = new JSONObject();
+        read(relationID);
+        try(FileReader file = new FileReader("src/function/messages/History/"+relationID+".json"))  {
+            JSONArray jsonArray = (JSONArray) parser.parse(file);
+            jsonObject = (JSONObject) jsonArray.get(jsonArray.size()-1);
+            message = (String) jsonObject.get("message");
+            from = (String) jsonObject.get("from");
+            messageInfo.add(from);
+            messageInfo.add(message);
+        } catch (IOException | ParseException e) {
+            System.out.println("Could not load history file: illegal structure");
+        }
+        return jsonObject.toString();
     }
 
     public static void write(String contactID, String from, String message) {

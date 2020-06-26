@@ -45,17 +45,18 @@ public class UserAction {
         return false;
     }
 
-    public static void delRelation(String email) {
+    public static boolean delRelation(String id) {
         Map<String, String> hm = new HashMap<>();
         try {
             hm.put("identifiant", User.getId());
-            hm.put("mail", email);
+            hm.put("relation", id);
             String serv = ProcessRequest.start(hm, "delier");
             JSONObject response = new JSONObject(serv);
-
             String param_message = response.getJSONObject("etat").getString("message");
+            return param_message.contains("OK");
         } catch (JSONException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -95,12 +96,12 @@ public class UserAction {
         }
     }
 
-    public static ArrayList<ArrayList<String>> readMessage(String contactID) {
+    public static ArrayList<ArrayList<String>> readMessage(String relationID) {
         Map<String, String> hm = new HashMap<>();
         ArrayList<ArrayList<String>> messageArray = new ArrayList<>();
         try {
             hm.put("identifiant", User.getId());
-            hm.put("relation", contactID);
+            hm.put("relation", relationID);
             String serv = ProcessRequest.start(hm, "lire");
             JSONObject response = new JSONObject(serv);
             JSONArray responseArray = response.getJSONArray("messages");
