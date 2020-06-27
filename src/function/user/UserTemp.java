@@ -37,9 +37,9 @@ public class UserTemp {
 
         JSONObject response = new JSONObject(serv);
         try {
-            id = response.getString("identite");
+            id = response.getString("identifiant");
             mail = response.getString("mail");
-            identifiant = response.getString("identifiant");
+            identifiant = response.getString("identite");
             return true;
 
         } catch (JSONException e) {

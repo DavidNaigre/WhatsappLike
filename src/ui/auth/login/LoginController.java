@@ -1,5 +1,6 @@
 package ui.auth.login;
 
+import function.appPath;
 import function.user.AuthUser;
 import function.user.UserTemp;
 import javafx.event.ActionEvent;
@@ -47,7 +48,7 @@ public class LoginController implements Initializable {
     }
 
     public void handleBackButtonAction(ActionEvent actionEvent) throws IOException {
-        Parent home = FXMLLoader.load(getClass().getResource("../home/HomeView.fxml"));
+        Parent home = FXMLLoader.load(getClass().getResource("/ui/auth/home/HomeView.fxml"));
         Scene homeScene = new Scene(home);
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         window.setScene(homeScene);
@@ -59,7 +60,7 @@ public class LoginController implements Initializable {
         String id = idTextarea.getText();
         if(conServ.isCon() && UserTemp.setParameters(id)) {
             try {
-                Files.walk(Paths.get("../../../function/messages/history/"))
+                Files.walk(Paths.get(appPath.getMessageDIRECTORY()))
                         .filter(Files::isRegularFile)
                         .map(Path::toFile)
                         .forEach(File::delete);
@@ -73,7 +74,7 @@ public class LoginController implements Initializable {
 
     public void switchPage(ActionEvent actionEvent){
         try {
-            Parent home = FXMLLoader.load(getClass().getResource("../../chat/ChatView.fxml"));
+            Parent home = FXMLLoader.load(getClass().getResource("/ui/chat/ChatView.fxml"));
             Scene homeScene = new Scene(home);
             Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
             if (AuthUser.register()) {

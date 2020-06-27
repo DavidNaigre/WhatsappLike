@@ -88,7 +88,7 @@ public class CreateAccountController implements Initializable {
 
     @FXML
     public void handleBackButtonAction(ActionEvent actionEvent) throws Exception {
-        Parent home = FXMLLoader.load(getClass().getResource("../home/HomeView.fxml"));
+        Parent home = FXMLLoader.load(getClass().getResource("/ui/auth/home/HomeView.fxml"));
         Scene homeScene = new Scene(home);
         Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         window.setScene(homeScene);
@@ -106,7 +106,7 @@ public class CreateAccountController implements Initializable {
             if (UserAction.createAccount(pseudoField.getText(), mailField.getText())) {
                 System.out.println("Compte créé");
             } else System.out.println("Carotte la tchuite");
-            Parent login = FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"));
+            Parent login = FXMLLoader.load(getClass().getResource("/ui/auth/login/LoginView.fxml"));
             Scene homeScene = new Scene(login);
             Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
             window.setScene(homeScene);

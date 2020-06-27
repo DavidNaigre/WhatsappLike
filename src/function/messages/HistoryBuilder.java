@@ -1,5 +1,6 @@
 package function.messages;
 
+import function.appPath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -18,7 +19,7 @@ public class HistoryBuilder {
     public static ArrayList<ArrayList<String>> read(String contactID){
         ArrayList<ArrayList<String>> data = new ArrayList<>();
         JSONParser parser = new JSONParser();
-        try(FileReader file = new FileReader("src/function/messages/History/"+contactID+".json"))  {
+        try(FileReader file = new FileReader(appPath.getMessageDIRECTORY()+contactID+".json"))  {
             Object obj = parser.parse(file);
             JSONArray jsonArray = (JSONArray) obj;
             for(Object jsonData: jsonArray){
@@ -36,16 +37,18 @@ public class HistoryBuilder {
     }
 
     public static String lastMessage(String relationID) {
-        String message = "", from = "";
+        String message = "", from = "", date = "";
         ArrayList<String> messageInfo = new ArrayList();
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = new JSONObject();
         read(relationID);
-        try(FileReader file = new FileReader("src/function/messages/History/"+relationID+".json"))  {
+        try(FileReader file = new FileReader(appPath.getMessageDIRECTORY()+relationID+".json"))  {
             JSONArray jsonArray = (JSONArray) parser.parse(file);
             jsonObject = (JSONObject) jsonArray.get(jsonArray.size()-1);
             message = (String) jsonObject.get("message");
             from = (String) jsonObject.get("from");
+            date = (String) jsonObject.get("date");
+            messageInfo.add(date);
             messageInfo.add(from);
             messageInfo.add(message);
         } catch (IOException | ParseException e) {
@@ -60,7 +63,7 @@ public class HistoryBuilder {
         JSONArray historyArray = new JSONArray();
         try {
             JSONParser parser = new JSONParser();
-            try (FileReader file = new FileReader("src/function/messages/History/" + contactID + ".json")) {
+            try (FileReader file = new FileReader(appPath.getMessageDIRECTORY() + contactID + ".json")) {
                 Object obj = parser.parse(file);
                 JSONArray jsonArray = (JSONArray) obj;
                 if (!jsonArray.isEmpty()) historyArray = jsonArray;
@@ -74,7 +77,7 @@ public class HistoryBuilder {
             obj.put("message", message);
             historyArray.add(obj);
 
-            try (FileWriter file = new FileWriter("src/function/messages/History/" + contactID + ".json", false)) {
+            try (FileWriter file = new FileWriter(appPath.getMessageDIRECTORY() + contactID + ".json", false)) {
                 file.write(historyArray.toString());
                 file.flush();
             } catch (IOException e) {

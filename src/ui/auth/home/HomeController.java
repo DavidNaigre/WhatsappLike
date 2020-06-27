@@ -88,7 +88,7 @@ public class HomeController implements Initializable {
 
     public void handleSameAccountButtonClick(ActionEvent actionEvent){
         try {
-            Parent chat = FXMLLoader.load(getClass().getResource("../../chat/ChatView.fxml"));
+            Parent chat = FXMLLoader.load(getClass().getResource("/ui/chat/ChatView.fxml"));
             Scene chatScene = new Scene(chat);
             Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             window.setScene(chatScene);
@@ -101,7 +101,7 @@ public class HomeController implements Initializable {
 
     public void handleNewAccountButtonClick(ActionEvent actionEvent){
         try {
-            Parent home = FXMLLoader.load(getClass().getResource("../create/CreateAccountView.fxml"));
+            Parent home = FXMLLoader.load(getClass().getResource("/ui/auth/create/CreateAccountView.fxml"));
             Scene homeScene = new Scene(home);
             Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
             window.setScene(homeScene);
@@ -116,7 +116,7 @@ public class HomeController implements Initializable {
     public void handleConnectButtonClick(ActionEvent actionEvent){
         try  {
             conServ.setCon(true);
-            Parent login = FXMLLoader.load(getClass().getResource("../login/LoginView.fxml"));
+            Parent login = FXMLLoader.load(getClass().getResource("/ui/auth/login/LoginView.fxml"));
             Scene loginScene = new Scene(login);
             Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
             window.setScene(loginScene);

@@ -1,11 +1,13 @@
 package ui.chat;
 
 import function.TextConstructor;
+import function.appPath;
 import function.messages.HistoryBuilder;
 import function.user.User;
 import function.user.UserAction;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -17,6 +19,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -42,8 +46,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatView implements Initializable {
-    @FXML private ScrollPane scrollPane;
-    @FXML private VBox clientListBox, chatBox;
+    @FXML private ScrollPane scrollPane,clientListScrollSearch;
+    @FXML private VBox clientListBox, chatBox, clientListBoxSearch;
     @FXML private TextField searchInput, messageInput, newContactInput;
     @FXML private TextFlow serverReponseBox;
     @FXML private Text errorMessageMail, serverReponseText;
@@ -55,7 +59,6 @@ public class ChatView implements Initializable {
     private String contactId = "";
 
     private Map<String, String> initContactList;
-    private boolean lastMessageThreadStop = true;
     private int nbrOfContact;
     private static final Pattern VALIDEMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private final int THREADS_NUMBER_ALLOW = 2;
@@ -102,15 +105,14 @@ public class ChatView implements Initializable {
             }
         });
         try {
-            var path = new File("src/ui/ressources/profile/user.png").toURI().toString();
-            URL imgUrl = getClass().getResource(path);
-            if(imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
+            String path= new File("/ui/ressources/profile/user.png").toURI().toString();
             userImageProfile.setImage(new Image(path));
-            userImageProfile.getStyleClass().add("image-view");
-
         } catch (Exception e) {
-            e.printStackTrace();
+            String path= new File("/ui/ressources/profile/default.png").toURI().toString();
+            userImageProfile.setImage(new Image(path));
         }
+        userImageProfile.getStyleClass().add("image-view");
+
         messageInput.textProperty().addListener(observable-> sendButton.setDisable(messageInput.getText().isEmpty()));
         chatBox.heightProperty().addListener(observable -> {
             scrollPane.layout();
@@ -135,46 +137,46 @@ public class ChatView implements Initializable {
                 });
             }
         },500, 500, TimeUnit.MILLISECONDS);
-        pool.scheduleAtFixedRate(()->{
-            if(lastMessageThreadStop){
-                contactLastMessage();
-            }
-        },1000 ,1000, TimeUnit.MILLISECONDS);
+
+//        pool.scheduleAtFixedRate(()->{
+//            if(lastMessageThreadStop){
+//                contactLastMessage();
+//            }
+//        },1000 ,1000, TimeUnit.MILLISECONDS);
     }
+
     public void contactLastMessage () {
         System.out.println("IN LAST MESSAGE METHOD \n");
-        String state;
+        Label lblname = new Label();
+        lblname.getStyleClass().add("online-label-details");
+
         for ( Node child : clientListBox.getChildren() ){
-            String id = child.getId(), messageInfo = ((String) child.getUserData());
+            String id = child.getId();
+            ArrayList<ArrayList<String>> messageList = UserAction.readMessage(id);
+            messageList.forEach(message -> HistoryBuilder.write(id, message.get(0), message.get(1)));
+            String child_messageInfo = ((String) child.getUserData());
+            String new_messageInfo = HistoryBuilder.lastMessage(id);
+            System.out.println(id+" : "+ new_messageInfo);
             try {
-                JSONObject json = (JSONObject) new JSONParser().parse(messageInfo);
-                if(json.containsKey("message")) {
-                    String jsonLastMessage = (String) json.get("message");
-                    ArrayList<ArrayList<String>> messageList = UserAction.readMessage(id);
-                    messageList.forEach(message -> HistoryBuilder.write(id, message.get(0), message.get(1)));
-                    JSONObject jsonTemp = (JSONObject) new JSONParser().parse(HistoryBuilder.lastMessage(id));
-                    messageInfo = jsonTemp.toString();
-                    String lastMessage = (String) jsonTemp.get("message");
-                    if(child instanceof  HBox){
-                        if(messageList.size() > 0) state = "Nouveau message";
-                        else state = "";
-                        Label lblname = new Label(state);
-                        lblname.getStyleClass().add("online-label-details");
+                JSONObject json = (JSONObject) new JSONParser().parse(new_messageInfo);
+                if(json.containsKey("from") && json.containsKey("message")) {
+                    if( id.equals(contactId)) {
+                        lblname.setText("");
                         Platform.runLater(() -> ((VBox)((HBox)child).getChildren().get(1)).getChildren().set(1,lblname));
+                    } else if(!new_messageInfo.equals(child_messageInfo)){
+                        String expediteur = (String) json.get("from");
+                        if (!expediteur.equals(this.userName.getText())) {
+                            lblname.setText("Nouveau message !");
+                            child.setUserData(new_messageInfo);
+                            Platform.runLater(() -> ((VBox) ((HBox) child).getChildren().get(1)).getChildren().set(1, lblname));
+                        }
                     }
                 }
 
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            System.out.println(id+" : "+ messageInfo);
         }
-    }
-
-    public void handleEnterSearchKeyReleased() {
-        String message = searchInput.getText().trim();
-        updateMSG(User.getIdentifiant(),message);
-        searchInput.setText("");
     }
 
     public void handleSendMessageClick() {
@@ -204,74 +206,95 @@ public class ChatView implements Initializable {
         Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
     }
 
+    public HBox containerBuilder (String id, String name){
+        HBox container = new HBox();
+        container.setAlignment(Pos.CENTER);
+        container.setSpacing(20);
+        container.setPrefWidth(clientListBoxSearch.getPrefWidth());
+        container.setPadding(new Insets(10));
+        container.getStyleClass().add("online-user-container");
+        //Photo de profile
+        Circle img = new Circle(60, 60, 30);
+        try {
+            String path= new File(String.format("/ui/ressources/profile/%s.png", name)).toURI().toString();
+            img.setFill(new ImagePattern(new Image(path)));
+        } catch (Exception e) {
+            String path= new File("/ui/ressources/profile/default.png").toURI().toString();
+            img.setFill(new ImagePattern(new Image(path)));
+        }
+        container.getChildren().add(img);
+
+        //Nom contact
+        VBox userDetailContainer = new VBox();
+        userDetailContainer.setPrefWidth(clientListBoxSearch.getPrefWidth() / 1.5);
+        Label lblUsername = new Label(name);
+        lblUsername.getStyleClass().add("online-label");
+        userDetailContainer.getChildren().add(lblUsername);
+
+        //Dernier message
+        Label lblname = new Label("");
+        lblname.getStyleClass().add("online-label-details");
+        userDetailContainer.getChildren().add(lblname);
+        container.getChildren().add(userDetailContainer);
+
+        container.setId(id);
+        String messageInfo = HistoryBuilder.lastMessage(id);
+        container.setUserData(messageInfo);
+        return container;
+    }
+
     private Map<String, String> updateContactList() {
-        lastMessageThreadStop = false;
         Map<String, String> contactList = UserAction.getListRelation();
         if (!contactList.equals(initContactList)) {
             Platform.runLater(() -> clientListBox.getChildren().clear());
             for ( Map.Entry<String, String> entry : contactList.entrySet() ) {
-                String id = entry.getKey();
-                String name = entry.getValue();
-
+                String id = entry.getKey(), name = entry.getValue();
                 if (name.equals(this.userName.getText())) continue;
-                HBox container = new HBox();
-                container.setAlignment(Pos.CENTER);
-                container.setSpacing(20);
-                container.setPrefWidth(clientListBox.getPrefWidth());
-                container.setPadding(new Insets(10));
-                container.getStyleClass().add("online-user-container");
-                //Photo de profile
-                Circle img = new Circle(60, 60, 30);
-                try {
-                    var path = new File(String.format("src/ui/ressources/profile/%s.png", name)).toURI().toString();
-                    URL imgUrl = getClass().getResource(path);
-                    if (imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
-                    img.setFill(new ImagePattern(new Image(path)));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                container.getChildren().add(img);
-
-                //Nom contact
-                VBox userDetailContainer = new VBox();
-                userDetailContainer.setPrefWidth(clientListBox.getPrefWidth() / 1.5);
-                Label lblUsername = new Label(name);
-                lblUsername.getStyleClass().add("online-label");
-                userDetailContainer.getChildren().add(lblUsername);
-
-                //Dernier message
-                String lastMessage = "", messageInfo = HistoryBuilder.lastMessage(id);
-                try {
-                    JSONParser parser = new JSONParser();
-                    JSONObject json = (JSONObject) parser.parse(messageInfo);
-                    lastMessage = json.containsKey("message") ? (String) json.get("message") : "";
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                Label lblname = new Label("");
-                lblname.getStyleClass().add("online-label-details");
-                userDetailContainer.getChildren().add(lblname);
-                container.getChildren().add(userDetailContainer);
-
+                HBox container = containerBuilder(id,name);
                 container.setOnMouseClicked(e -> {
                     if(!id.equals(contactId)) {
                         startPane.setVisible(false);
                         startPane.setDisable(true);
-                        lblname.setText("");
                         clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
                         container.getStyleClass().add("online-user-container-active");
-                        changeChat(lblUsername.getText(), id);
+                        changeChat(name, id);
                     }
                 });
-                container.setId(id);
-                container.setUserData(messageInfo);
                 Platform.runLater(() -> clientListBox.getChildren().add(container));
             }
             initContactList = contactList;
         }
-        lastMessageThreadStop = true;
         return contactList;
+    }
+
+    public void handleEnterSearchKeyReleased(Event event) {
+        clientListScrollSearch.setVisible(true);
+        Platform.runLater(() -> clientListBoxSearch.getChildren().clear());
+        if (event.getEventType() == KeyEvent.KEY_PRESSED && ((KeyEvent)event).getCode() == KeyCode.ESCAPE) {
+            searchInput.clear();
+            clientListBoxSearch.setVisible(false);
+        }
+        else {
+            String search = searchInput.getText().trim();
+            Map<String, String> contactList = UserAction.getListRelation();
+            if(search.length() > 0 ) contactList.values().removeIf(value -> !value.toLowerCase().contains(search.toLowerCase()));
+
+            for ( Map.Entry<String, String> entry : contactList.entrySet() ) {
+                String id = entry.getKey();
+                String name = entry.getValue();
+                HBox container = containerBuilder(id,name);
+                container.setOnMouseClicked(e -> {
+                    searchInput.clear();
+                    clientListBox.getChildren().forEach(client -> client.getStyleClass().remove("online-user-container-active"));
+                    clientListBox.lookup("#"+id).getStyleClass().add("online-user-container-active");
+                    clientListScrollSearch.setVisible(false);
+                    startPane.setVisible(false);
+                    startPane.setDisable(true);
+                    changeChat(name, id);
+                });
+                Platform.runLater(() -> clientListBoxSearch.getChildren().add(container));
+            }
+        }
     }
 
     public void changeChat(String to, String id){
@@ -280,15 +303,19 @@ public class ChatView implements Initializable {
         contactId = id;
         messageInput.clear();
         try {
-            var path = new File(String.format("src/ui/ressources/profile/%s.png",contactName.getText())).toURI().toString();
-            URL imgUrl = getClass().getResource(path);
-            if(imgUrl == null) path = new File("src/ui/ressources/profile/default.png").toURI().toString();
+            String path= new File(String.format("/ui/ressources/profile/%s.png", contactName.getText())).toURI().toString();
             contactImageProfile.setImage(new Image(path));
         } catch (Exception e) {
-            e.printStackTrace();
+            String path= new File("/ui/ressources/profile/default.png").toURI().toString();
+            contactImageProfile.setImage(new Image(path));
         }
         ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(contactId));
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
+    }
+
+    public void heandleSearchOptionLeave() {
+        searchInput.clear();
+        clientListScrollSearch.setVisible(false);
     }
 
     public void handleNewRelationButton() {
@@ -333,16 +360,6 @@ public class ChatView implements Initializable {
         }
     }
 
-    public void closeBtn(){
-        pool.shutdown();
-        Runtime.getRuntime().exit(0);
-        ((Stage)closeButton.getScene().getWindow()).close();
-    }
-
-    public void handleReduceButton() {
-        ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
-    }
-
     public boolean checkMail(String emailStr) {
         Matcher matcher = VALIDEMAIL.matcher(emailStr);
         return matcher.find();
@@ -360,18 +377,28 @@ public class ChatView implements Initializable {
     public void handleDeleteFriendSendButton() {
         if(UserAction.delRelation(contactId)){
             try {
-                File file = new File("../../function/messages/history/"+contactId+".json");
-                file.delete();
+                File file = new File(appPath.getMessageDIRECTORY()+contactId+".json");
+                if (file.delete()) System.out.println("History successfuly delete");
+                else System.out.println("History failed to delete");
                 contactId = "";
                 contactName.setText("");
                 startPane.setVisible(true);
                 overlayPane.setVisible(false);
                 updateContactList();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void closeBtn(){
+        pool.shutdown();
+        Runtime.getRuntime().exit(0);
+        ((Stage)closeButton.getScene().getWindow()).close();
+    }
+
+    public void handleReduceButton() {
+        ((Stage)reduceButton.getScene().getWindow()).setIconified(true);
     }
 }
 

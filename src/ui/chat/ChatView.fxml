@@ -78,7 +78,7 @@
       </Pane>
       <Pane layoutY="65.0" prefHeight="45.0" prefWidth="435.0" styleClass="search-bar-bg">
          <HBox alignment="CENTER" prefHeight="45.0" prefWidth="435.0">
-            <TextField fx:id="searchInput" onAction="#handleEnterSearchKeyReleased" prefHeight="23.0" prefWidth="409.0" promptText="Rechercher ou démarrer un nouvelle discussion" styleClass="message-bar">
+            <TextField fx:id="searchInput" onKeyReleased="#handleEnterSearchKeyReleased" onMouseClicked="#handleEnterSearchKeyReleased" prefHeight="23.0" prefWidth="409.0" promptText="Rechercher ou démarrer un nouvelle discussion" styleClass="message-bar">
                <HBox.margin>
                   <Insets left="10.0" right="10.0" />
                </HBox.margin>
@@ -89,6 +89,16 @@
          <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="655.0" prefWidth="435.0">
             <VBox fx:id="clientListBox" prefHeight="655.0" prefWidth="435.0" />
          </AnchorPane>
+      </ScrollPane>
+      <ScrollPane fx:id="clientListScrollSearch" hbarPolicy="NEVER" layoutY="110.0" prefHeight="655.0" prefWidth="435.0" styleClass="contactlist-bg" visible="false" vvalue="1.0">
+         <content>
+            <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="655.0" prefWidth="435.0">
+               <children>
+                  <VBox fx:id="clientListBoxSearch" layoutY="27.0" prefHeight="628.0" prefWidth="435.0" />
+                  <Hyperlink onAction="#heandleSearchOptionLeave" styleClass="new-contact-cancel" text="&lt; retour" />
+               </children>
+            </AnchorPane>
+         </content>
       </ScrollPane>
    </Pane>
    <Pane fx:id="startPane" layoutX="435.0" layoutY="35.0" prefHeight="765.0" prefWidth="845.0" styleClass="start-pane">
