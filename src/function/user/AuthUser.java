@@ -1,4 +1,5 @@
 package function.user;
+
 import function.appPath;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
@@ -9,7 +10,6 @@ import java.io.FileWriter;
 
 public class AuthUser {
     private static final String filePath = appPath.getAuthDIRECTORY()+"auth.json";
-
     public static boolean register (String id, String name, String mail){
         JSONObject obj = new JSONObject();
         obj.put("id",id);

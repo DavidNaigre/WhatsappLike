@@ -30,23 +30,35 @@ public class Main extends Application {
 
     public void init() throws Exception {
         super.init();
-        String CurrentPATH = getCurrentPath();
-        String authDIRECTORY = CurrentPATH+"/WALLOG/auth/";
-        String historyDIRECTORY = CurrentPATH+"/WALLOG/message/history/";
-        appPath.setPaths(CurrentPATH, authDIRECTORY, historyDIRECTORY);
+        String authDIRECTORY, historyDIRECTORY;
+        String ParentPATH = getParentPath();
 
-        File auth_dir = new File(authDIRECTORY);
-        File hist_dir = new File(historyDIRECTORY);
-        if(!auth_dir.exists()) auth_dir.mkdirs();
-        if(!hist_dir.exists()) hist_dir.mkdirs();
+        if(getCurrentPath().contains("jar")){
+            authDIRECTORY = ParentPATH+"/WALLOG/auth/";
+            historyDIRECTORY = ParentPATH+"/WALLOG/message/history/";
+
+            File auth_dir = new File(authDIRECTORY);
+            File hist_dir = new File(historyDIRECTORY);
+
+            if(!auth_dir.exists()) auth_dir.mkdirs();
+            if(!hist_dir.exists()) hist_dir.mkdirs();
+        } else {
+            authDIRECTORY = "src/function/user/";
+            historyDIRECTORY = "src/function/messages/history/";
+        }
+        appPath.setPaths(ParentPATH, authDIRECTORY, historyDIRECTORY);
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    public static String getCurrentPath() throws URISyntaxException {
+    public static String getParentPath() throws URISyntaxException {
         return new File(Main.class.getProtectionDomain().getCodeSource().getLocation()
                 .toURI()).getParent();
+    }
+    public static String getCurrentPath() throws URISyntaxException {
+        return new File(Main.class.getProtectionDomain().getCodeSource().getLocation()
+                .toURI()).getPath();
     }
 }

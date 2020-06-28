@@ -17,6 +17,7 @@ public class appPath {
         appPath.currentPath = currentPath;
         appPath.authDIRECTORY = authDIRECTORY;
         appPath.messageDIRECTORY = messageDIRECTORY;
+
     }
     private static String currentPath, authDIRECTORY, messageDIRECTORY;
 }

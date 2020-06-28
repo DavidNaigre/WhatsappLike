@@ -105,11 +105,13 @@ public class ChatView implements Initializable {
             }
         });
         try {
-            String path= new File("/ui/ressources/profile/user.png").toURI().toString();
-            userImageProfile.setImage(new Image(path));
+//            String path= new File(imagePath+"user.png").toURI().toString();
+            URL imageUrl = ClassLoader.getSystemResource("user.png");
+            userImageProfile.setImage(new Image(String.valueOf(imageUrl)));
         } catch (Exception e) {
-            String path= new File("/ui/ressources/profile/default.png").toURI().toString();
-            userImageProfile.setImage(new Image(path));
+//            String path= new File(imagePath+"default.png").toURI().toString();
+            URL imageUrl = ClassLoader.getSystemResource("default.png");
+            userImageProfile.setImage(new Image(String.valueOf(imageUrl)));
         }
         userImageProfile.getStyleClass().add("image-view");
 
@@ -216,11 +218,11 @@ public class ChatView implements Initializable {
         //Photo de profile
         Circle img = new Circle(60, 60, 30);
         try {
-            String path= new File(String.format("/ui/ressources/profile/%s.png", name)).toURI().toString();
-            img.setFill(new ImagePattern(new Image(path)));
+            URL imgUrl =  ClassLoader.getSystemResource(String.format("%s.png", name));
+            if (imgUrl == null) imgUrl =  ClassLoader.getSystemResource("default.png");
+            img.setFill(new ImagePattern(new Image(imgUrl.toString())));
         } catch (Exception e) {
-            String path= new File("/ui/ressources/profile/default.png").toURI().toString();
-            img.setFill(new ImagePattern(new Image(path)));
+            e.printStackTrace();
         }
         container.getChildren().add(img);
 
@@ -303,11 +305,11 @@ public class ChatView implements Initializable {
         contactId = id;
         messageInput.clear();
         try {
-            String path= new File(String.format("/ui/ressources/profile/%s.png", contactName.getText())).toURI().toString();
-            contactImageProfile.setImage(new Image(path));
+            URL imgUrl =  ClassLoader.getSystemResource(String.format("%s.png", contactName.getText()));
+            if (imgUrl == null) imgUrl =  ClassLoader.getSystemResource("default.png");
+            contactImageProfile.setImage(new Image(imgUrl.toString()));
         } catch (Exception e) {
-            String path= new File("/ui/ressources/profile/default.png").toURI().toString();
-            contactImageProfile.setImage(new Image(path));
+            e.printStackTrace();
         }
         ArrayList<ArrayList<String>> history = new  ArrayList<>(HistoryBuilder.read(contactId));
         if(!history.isEmpty()) history.forEach(line -> updateMSG(line.get(1), line.get(2)));
